@@ -244,3 +244,11 @@ checks passed for zero, positive/negative bases, and negative exponents; invalid
 and overflow cases return NULL. Its 90-query expanded trial is running.
 No POWER replacement has been accepted or imported yet. Original fuzz failures
 at indices 404 and 3430 remain included in the execution denominator.
+
+POWER repair-002 failed expanded contextual accuracy (despite zero isolated
+target errors): MySQL grouped/HAVING rewrites produced duplicate/unknown column
+names in its correlated derived bindings. Do not import it. All of its failed
+SQL execute after qualifying `power_args` references and explicitly casting
+bound operands to DECIMAL(65,0). Repair-003 in
+`runs/mysql-power-domain-repair-003` retains those context regressions and is
+currently running the full 90-query validation (seed 0). It is not accepted yet.
