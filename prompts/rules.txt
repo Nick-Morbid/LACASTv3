@@ -17,6 +17,10 @@ another expression, return only constants/NULL, or mask execution with dead CASE
 branches. Keep normal typed inputs variable. Domain-restricted parameters may
 use documented literal choices (formats, time units, positive divisors, etc.).
 The generator wraps every learned expression in parentheses automatically.
+For regex pattern parameters use regexpatternAtom: Python composes valid varied
+regex patterns (groups, alternatives, classes, quantifiers and anchors). This
+semantic argument domain is not an arbitrary text column. Preserve the variable
+subject operand and use explicit casts for documented binary/numeric overloads.
 Use MySQL 8.4 syntax in PG-incompatible contexts (no PostgreSQL casts).
 SLEEP must use literal 0, BENCHMARK must use literal 1, and GET_LOCK timeout
 must use literal 0. No file writes, side effects outside the current session,

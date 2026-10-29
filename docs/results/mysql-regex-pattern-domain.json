@@ -1,0 +1,17 @@
+{
+  "scope": "Semantic regex argument generator diagnostic; not full snapshot acceptance",
+  "executed": 200,
+  "passed": 200,
+  "errors": 0,
+  "seed": 71,
+  "evidence_directory": "runs/mysql-regexp-pattern-domain-001",
+  "constructs": [
+    "literals",
+    "classes",
+    "groups",
+    "alternation",
+    "quantifiers",
+    "anchors"
+  ],
+  "limitations": "Generation vocabulary is not a complete ICU regex grammar; arbitrary text and binary columns are not assumed to contain valid patterns."
+}

@@ -6,6 +6,7 @@ from .coverage import GeneratedSQL
 from .productions import Rule
 from .compiler import SQL_TOKENS
 from .semantics import Column, Expression, Scope, validate_projection
+from .regex_patterns import regex_pattern, mysql_string
 
 
 class GenerationFailure(ValueError):
@@ -29,6 +30,8 @@ class SQLGenerator:
                       zip(table['fields'], table['types'])], parent)
 
     def atom(self, dtype, scope):
+        if dtype == 'regexpattern':
+            return Expression(mysql_string(regex_pattern(self.random)), 'char')
         if dtype == 'any':
             dtype = self.random.choice(list(self.constants))
         if dtype not in self.constants:
