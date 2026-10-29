@@ -273,3 +273,12 @@ remain pending. Existing validation/audit/fuzz processes retain their original
 loaded runtime; this edit does not retroactively change their evidence. The
 three verified replacements above remain pending import, and revised-snapshot
 full validation, training audit, and 10,000-query execution remain required.
+
+The retained MAX-trial parser comparison completed all 90 SQL. Every original
+and factored parse had identical sets of all named learned-rule contexts,
+including nested contexts. Aggregate parsing time was 222.179 seconds for the
+original dispatcher and 68.069 seconds for the factored dispatcher (about 3.26x
+on this specific retained trial, not a universal performance guarantee).
+Raw timings and context sets are retained locally in
+runs/parser-parenthesis-factor-benchmark-001/all-comparison.jsonl. Existing
+long-running jobs remain on their original loaded runtime and are still live.
