@@ -74,7 +74,9 @@ def compile_rules(base: Path, rules: list[Rule], destination: Path):
                 active_names.append(name)
                 seen.add(identity)
         source = source.replace('primary\n    : literal', 'primary\n    : learnedPrimary\n    | literal')
-        source += '\nlearnedPrimary: ' + ' | '.join(f"LP {name} RP" for name in active_names) + ';\n'
+        # Factor the shared boundary before adaptive prediction. Keep the
+        # alternative order and named contexts (including nested coverage).
+        source += '\nlearnedPrimary: LP (' + ' | '.join(active_names) + ') RP;\n'
         for name, definition in zip(rule_map, definitions):
             source += f'{name}: {definition};\n'
         # Implicit ANTLR literals take lexical precedence over IDENTIFIER,

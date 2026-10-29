@@ -76,7 +76,7 @@ def test_duplicate_syntax_keeps_first_target_context_and_all_definitions(tmp_pat
     grammar = tmp_path / 'LearnedMySQL.g4'
     mapping = compile_rules(ROOT / 'configs/mysql/MySQLBase.g4', rules, grammar)
     source = grammar.read_text()
-    assert 'learnedPrimary: LP learnedRule0 RP;' in source
+    assert 'learnedPrimary: LP (learnedRule0) RP;' in source
     assert 'learnedRule1:' in source
     syntax = SQLParser(grammar, ROOT / 'vendor/antlr-4.13.2-complete.jar', tmp_path / 'cache', mapping)
     assert syntax.parse('SELECT (ABS(1));').rule_ids == {'target-double'}
@@ -93,6 +93,33 @@ def test_definition_normalization_only_removes_redundant_operand_choices():
     literal = 'learnedRule0: ' + terminal("'(expression | expression)'") + ';'
     assert normalized_definition(literal) == literal
     assert normalized_definition(old) != normalized_definition(new.replace("'+'", "'-'"))
+
+
+def test_factored_boundaries_preserve_nested_contexts_and_rejection(tmp_path):
+    rules = [Rule('abs', 'integer', '"ABS(" integerExpr ")"'),
+             Rule('add', 'integer', 'integerExpr "+" integerExpr'),
+             Rule('max', 'double', '"MAX(" ("DISTINCT ")? doubleExpr ")"', True)]
+    grammar = tmp_path / 'FactoredMySQL.g4'
+    mapping = compile_rules(ROOT / 'configs/mysql/MySQLBase.g4', rules, grammar)
+    baseline = tmp_path / 'OriginalMySQL.g4'
+    source = grammar.read_text().replace('grammar FactoredMySQL;', 'grammar OriginalMySQL;')
+    source = source.replace('learnedPrimary: LP (learnedRule0 | learnedRule1 | learnedRule2) RP;',
+                            'learnedPrimary: LP learnedRule0 RP | LP learnedRule1 RP | LP learnedRule2 RP;')
+    baseline.write_text(source)
+    jar = ROOT / 'vendor/antlr-4.13.2-complete.jar'
+    old = SQLParser(baseline, jar, tmp_path / 'old', mapping)
+    new = SQLParser(grammar, jar, tmp_path / 'new', mapping)
+    for sql, expected in [
+        ('SELECT (ABS((2 + 3)));', {'abs', 'add'}),
+        ('SELECT (MAX(DISTINCT (ABS(2)))) FROM table1;', {'max', 'abs'}),
+        ('SELECT ((ABS(2)) + (ABS(3)));', {'add', 'abs'}),
+        ('SELECT ABS(2);', set()),
+    ]:
+        assert old.parse(sql).rule_ids == new.parse(sql).rule_ids == expected
+    for sql in ['SELECT (ABS(2);', 'SELECT ((2 + 3)); garbage']:
+        for parser in (old, new):
+            with pytest.raises(ParseFailure):
+                parser.parse(sql)
 
 
 def test_productions_cannot_smuggle_another_statement(tmp_path):

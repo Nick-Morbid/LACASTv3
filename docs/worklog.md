@@ -260,3 +260,16 @@ all matched expected results (including zero/negative-exponent and overflow
 guards), and all repair-002 failed contexts execute successfully. It is pending
 import under `Mathematical Functions::POWER(X,Y)`, replacing
 da37350a06cbba0ed737b068. Only repair-003 is accepted among the POWER attempts.
+
+Parser boundary factoring is now implemented in the working tree: the shared
+LP/RP boundary surrounds the ordered learned-rule alternatives once. Named
+learnedRule contexts and syntax definitions are retained. A differential test
+compares nested aggregate/arithmetic contexts and malformed-input rejection
+against the previous dispatcher; the complete suite passed 67 tests. An
+independent baseline-versus-factored comparison of all 90 retained MAX trial
+SQL is running in runs/parser-parenthesis-factor-benchmark-001. Its first 30
+records have identical named-context sets; broader performance conclusions
+remain pending. Existing validation/audit/fuzz processes retain their original
+loaded runtime; this edit does not retroactively change their evidence. The
+three verified replacements above remain pending import, and revised-snapshot
+full validation, training audit, and 10,000-query execution remain required.
