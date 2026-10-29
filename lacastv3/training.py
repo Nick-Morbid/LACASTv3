@@ -213,6 +213,10 @@ class Trainer:
                                 if event['event'] == 'rule_verdict' and event.get('feature_key') == key
                                 and event.get('passed') and event['rule_id'] in {rule.id for rule in self.accepted}]
                 feedback = None
+                # A refinement response can repeat candidates that already
+                # passed in this feature. Keep their evidence and evaluate only
+                # new/repaired productions; never turn a failure into a pass.
+                passed_this_feature = {}
                 for refinement in range(4):
                     try:
                         candidates = self.propose(feature, description, feedback)
@@ -225,6 +229,11 @@ class Trainer:
                         continue
                     failed = []
                     for index, rule in enumerate(candidates):
+                        if rule.id in passed_this_feature:
+                            self.event('rule_evidence_reused', feature=feature, rule_id=rule.id,
+                                       trial=passed_this_feature[rule.id],
+                                       generation_profile=self.generation_profile)
+                            continue
                         trial_dir = feature_dir / f'trial-{time.time_ns()}-{index}'
                         try:
                             verdict = self.evaluate(rule, trial_dir, seed=refinement * 10000 + index)
@@ -233,6 +242,7 @@ class Trainer:
                             verdict = {'passed': False, 'error': detail}
                         self.event('rule_verdict', feature=feature, rule_id=rule.id, **verdict)
                         if verdict['passed']:
+                            passed_this_feature[rule.id] = str(trial_dir.relative_to(self.directory))
                             if rule.id not in {existing.id for existing in self.accepted}:
                                 self.accepted.append(rule)
                                 save(self.rules_path, [asdict(item) for item in self.accepted])

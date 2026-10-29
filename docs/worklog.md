@@ -76,3 +76,11 @@ once and retained, so grammar inputs and manifest hashes cannot describe
 different trainer revisions. New fuzz/revalidation processes archive an
 allowlisted runtime-source ZIP and hash public configurations. Credentials
 are excluded. Existing running processes keep their original code snapshots.
+
+Refinement no longer reevaluates an identical candidate already passed in the
+same feature and process: it records `rule_evidence_reused` pointing to the
+original trial, and continues evaluating new/repaired candidates. It does not
+reuse failed candidates or bypass later expanded revalidation. A regression
+test exercises a mixed pass/fail response followed by a repair; 38 tests pass.
+This change is pending application to the running trainer at its next justified
+engine upgrade; its current process still uses the archived baseline code.
