@@ -40,6 +40,7 @@ class Expression:
     aggregate: bool = False
     rule_ids: tuple[str, ...] = ()
     free_columns: frozenset[Column] = frozenset()
+    window: bool = False
 
 
 def validate_projection(expressions: list[Expression], grouping: set[Column]):

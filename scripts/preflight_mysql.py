@@ -8,6 +8,7 @@ from lacastv3.compiler import compile_rules
 from lacastv3.coverage import target_samples
 from lacastv3.database import MySQLDatabase
 from lacastv3.generator import SQLGenerator
+from lacastv3.context_generator import ContextSQLGenerator
 from lacastv3.parser import SQLParser
 from lacastv3.productions import Rule
 
@@ -16,17 +17,20 @@ parser = argparse.ArgumentParser()
 parser.add_argument('--db-config', type=Path)
 parser.add_argument('--output', type=Path, required=True)
 parser.add_argument('--initialize', action='store_true')
+parser.add_argument('--expanded', action='store_true', help='Check varied projections and typed derived outputs')
 args = parser.parse_args()
 args.output.mkdir(parents=True, exist_ok=False)
 db = MySQLDatabase(config_file=args.db_config)
 if args.initialize:
     db.initialize(ROOT / 'configs/mysql/schema.sql')
 rules = [Rule('preflight-abs', 'integer', '"ABS(" integerAtom ")"'),
-         Rule('preflight-sum', 'double', '"SUM(" doubleAtom ")"', True)]
+         Rule('preflight-sum', 'double', '"SUM(" doubleAtom ")"', True),
+         Rule('preflight-window', 'double', '"AVG(" doubleAtom ") OVER ()"', True)]
 grammar = args.output / 'PreflightMySQL.g4'
 mapping = compile_rules(ROOT / 'configs/mysql/MySQLBase.g4', rules, grammar)
 syntax = SQLParser(grammar, ROOT / 'vendor/antlr-4.13.2-complete.jar', args.output / 'parser', mapping)
-generator = SQLGenerator(
+generator_class = ContextSQLGenerator if args.expanded else SQLGenerator
+generator = generator_class(
     json.loads((ROOT / 'configs/mysql/schema.json').read_text()),
     json.loads((ROOT / 'configs/mysql/semantics.json').read_text())['types'], rules,
 )

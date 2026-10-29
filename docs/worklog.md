@@ -37,3 +37,20 @@ archived there, and code-change restarts are recorded in `events.jsonl`.
 
 These gates remain open; initial tests and intermediate metrics are not the
 final retraining result.
+
+## Expanded semantic contexts (2026-10-29)
+
+Added typed derived-output bindings, varied projection lists, join variants,
+matching set-operation outputs, and alias-safe grouping/HAVING/ORDER contexts.
+Window expressions retain argument dependencies and cannot enter WHERE or
+same-level HAVING. Training and fuzz CLI now default to `--generation-profile
+expanded`; `baseline` remains available for reproducing historical evidence.
+Verdicts and fuzz manifests explicitly record that profile. The already-running
+training process still uses its original baseline snapshot; its accepted rules
+require separate expanded-context revalidation before final delivery.
+
+Verification: 28 unit tests passed; expanded hand-written preflight passed
+165/165 queries. A snapshot of actual learned rules was tested in
+`runs/mysql-expanded-learned-fuzz-001`: 100/100 MySQL executions passed, zero
+ANTLR errors. This diagnostic sample does not replace per-rule revalidation
+or the required final 10,000-query run.

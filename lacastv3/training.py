@@ -16,7 +16,7 @@ from openai import OpenAI, APIError
 from .compiler import compile_rules, SQL_TOKENS
 from .coverage import target_samples
 from .database import MySQLDatabase
-from .generator import SQLGenerator
+from .profiles import generator_class
 from .parser import SQLParser
 from .productions import Rule
 from .features import feature_key, feature_directory, normalize_events, upgrade_state, migrate_feature_directories
@@ -52,10 +52,12 @@ def exclusive_run(directory):
 
 
 class Trainer:
-    def __init__(self, directory: Path, database: MySQLDatabase, feature_limit=0):
+    def __init__(self, directory: Path, database: MySQLDatabase, feature_limit=0, generation_profile='expanded'):
         self.directory = directory
         self.db = database
         self.feature_limit = feature_limit
+        self.generation_profile = generation_profile
+        self.generator_class = generator_class(generation_profile)
         self.constants = json.loads((ROOT / 'configs/mysql/semantics.json').read_text())['types']
         self.schema = json.loads((ROOT / 'configs/mysql/schema.json').read_text())
         self.corpus = json.loads((ROOT / 'configs/mysql/web_corpus.json').read_text(encoding='utf-8'))
@@ -138,7 +140,7 @@ class Trainer:
         mapping = compile_rules(ROOT / 'configs/mysql/MySQLBase.g4', all_rules, grammar)
         syntax = SQLParser(grammar, ROOT / 'vendor/antlr-4.13.2-complete.jar',
                            self.directory / 'parser_cache', mapping)
-        generator = SQLGenerator(self.schema, self.constants, all_rules, seed=seed)
+        generator = self.generator_class(self.schema, self.constants, all_rules, seed=seed)
         conn = self.db.connect()
         batches = []
         try:
@@ -175,7 +177,8 @@ class Trainer:
         finally:
             conn.close()
         verdict = {'rule': asdict(rule), 'passed': all(batch['accuracy'] > .95 and batch['target_errors'] == 0 for batch in batches),
-                   'threshold': '>0.95 per batch and zero target-attributed errors', 'batches': batches}
+                   'threshold': '>0.95 per batch and zero target-attributed errors', 'batches': batches,
+                   'generation_profile': self.generation_profile}
         save(directory / 'verdict.json', verdict)
         return verdict
 
@@ -188,7 +191,7 @@ class Trainer:
             version, database, sql_mode = cursor.fetchone()
         conn.close()
         self.event('training_started', pid=os.getpid(), server_version=version,
-                   database=database, sql_mode=sql_mode)
+                   database=database, sql_mode=sql_mode, generation_profile=self.generation_profile)
         features = [(category, name, text) for category, items in self.corpus.items() for name, text in items.items()]
         visited = 0
         try:

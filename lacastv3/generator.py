@@ -4,6 +4,7 @@ import re
 
 from .coverage import GeneratedSQL
 from .productions import Rule
+from .compiler import SQL_TOKENS
 from .semantics import Column, Expression, Scope, validate_projection
 
 
@@ -71,14 +72,17 @@ class SQLGenerator:
             raise GenerationFailure(f'Unsupported EBNF node: {node.kind}')
 
         sql = '(' + expand(rule.tree) + ')'
-        aggregate = rule.aggregate or any(piece.aggregate for piece in pieces)
+        own_window = 'OVER' in {token.upper() for token in SQL_TOKENS.findall(sql)}
+        window = own_window or any(piece.window for piece in pieces)
+        aggregate = (rule.aggregate and not own_window) or any(piece.aggregate for piece in pieces)
         free = frozenset(column for piece in pieces for column in piece.free_columns)
         if rule.aggregate:
-            if any(piece.aggregate for piece in pieces):
-                raise GenerationFailure('Nested aggregate expression')
-            free = frozenset()
+            if any(piece.aggregate or piece.window for piece in pieces):
+                raise GenerationFailure('Aggregate/window calls cannot be aggregate arguments')
+            if not own_window:
+                free = frozenset()
         ids = (rule.id,) + tuple(rule_id for piece in pieces for rule_id in piece.rule_ids)
-        return Expression(sql, rule.return_type, aggregate, ids, free)
+        return Expression(sql, rule.return_type, aggregate, ids, free, window)
 
     def generate(self, target, mode=None):
         mode = mode or self.random.choice(self.MODES)
@@ -103,7 +107,7 @@ class SQLGenerator:
         grouping = set(expression.free_columns) if mode == 'group' else set()
         validate_projection([expression], grouping)
         sql = f'{prefix}SELECT {expression.sql} AS result FROM {source}'
-        if mode == 'predicate' and not expression.aggregate:
+        if mode == 'predicate' and not expression.aggregate and not expression.window:
             sql = f'SELECT 1 AS result FROM {source} WHERE {expression.sql} IS NOT NULL'
         elif mode == 'group' and grouping:
             sql += ' GROUP BY ' + ', '.join(sorted(column.sql for column in grouping))

@@ -7,13 +7,13 @@ from pathlib import Path
 import time
 
 from .compiler import compile_rules
-from .generator import SQLGenerator
+from .profiles import generator_class
 from .parser import SQLParser, ParseFailure
 from .productions import Rule
 from .training import ROOT, save
 
 
-def run_fuzz(source: Path, output: Path, db, count=10000, seed=0):
+def run_fuzz(source: Path, output: Path, db, count=10000, seed=0, generation_profile='expanded'):
     if count < 1:
         raise ValueError('Count must be positive')
     if output.exists():
@@ -25,7 +25,7 @@ def run_fuzz(source: Path, output: Path, db, count=10000, seed=0):
     grammar = output / 'LearnedMySQL.g4'
     mapping = compile_rules(ROOT / 'configs/mysql/MySQLBase.g4', rules, grammar)
     syntax = SQLParser(grammar, ROOT / 'vendor/antlr-4.13.2-complete.jar', output / 'parser', mapping)
-    generator = SQLGenerator(json.loads((ROOT / 'configs/mysql/schema.json').read_text()),
+    generator = generator_class(generation_profile)(json.loads((ROOT / 'configs/mysql/schema.json').read_text()),
         json.loads((ROOT / 'configs/mysql/semantics.json').read_text())['types'], rules, seed=seed)
     conn = db.connect()
     with conn.cursor() as cursor:
@@ -33,6 +33,7 @@ def run_fuzz(source: Path, output: Path, db, count=10000, seed=0):
         version, database = cursor.fetchone()
     manifest = {'started_at': datetime.now(timezone.utc).isoformat(), 'server_version': version,
                 'database': database, 'source': str(source.resolve()), 'seed': seed, 'count': count,
+                'generation_profile': generation_profile,
                 'grammar_sha256': hashlib.sha256(grammar.read_bytes()).hexdigest(),
                 'rules_sha256': hashlib.sha256((source / 'trained_rules.json').read_bytes()).hexdigest()}
     save(output / 'manifest.json', manifest)
