@@ -62,3 +62,11 @@ The diagnostic limit leaves `full_snapshot_verified=false`. A full snapshot
 revalidation was subsequently launched in `runs/mysql-expanded-revalidation-001`
 while the original corpus trainer continues; neither writes the other's state.
 The snapshot does not include future trainer additions. Unit tests now total 29.
+
+Added gated `export`: requires complete corpus audit, expanded evidence for
+the exact exported rule snapshot, and retained 10,000-query fuzz results from
+the same server/database. It independently replays rule evidence and compiles
+the delivered grammar before writing a delivery manifest. Local credentials
+are excluded from copied configurations. Unit tests total 36, including gates
+against partial runs, baseline evidence and mismatched snapshots/environments.
+No final bundle has been exported: the full runtime gates remain outstanding.

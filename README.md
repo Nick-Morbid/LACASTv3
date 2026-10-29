@@ -78,3 +78,17 @@ in `summary.json`; `full_snapshot_verified` is true only if every snapshot rule
 passes. `--rule-limit` is diagnostic and cannot certify an untested remainder.
 A snapshot of an ongoing run does not certify subsequently accepted rules or
 the completion of the original training corpus.
+
+After full training, expanded revalidation and the 10,000-query fuzz run finish,
+create a deployment directory with:
+
+```sh
+uv run python -m lacastv3 export --work-dir runs/mysql --validation-dir runs/mysql-expanded-validation --fuzz-dir runs/mysql-fuzz10000 --output runs/mysql-delivery
+```
+
+Export replays the full training audit and each expanded trial audit, checks
+identical rule/grammar hashes and retained fuzz counts, and includes runtime
+code, clean grammar, type/schema configuration, bootstrap script and hashes.
+Local credentials are excluded. The delivery manifest is written only after
+all gates pass. Fuzz execution accuracy remains a measured result, not an
+assertion that every returned value is semantically correct.

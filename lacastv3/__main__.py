@@ -8,17 +8,20 @@ from .training import Trainer, exclusive_run
 from .fuzz import run_fuzz
 from .audit import run_audit
 from .revalidate import run_revalidation
+from .delivery import export_bundle
 
 
 def main():
     parser = argparse.ArgumentParser()
-    parser.add_argument('command', choices=['train', 'fuzz', 'audit', 'revalidate'])
+    parser.add_argument('command', choices=['train', 'fuzz', 'audit', 'revalidate', 'export'])
     parser.add_argument('--dbms', choices=['mysql'], default='mysql')
     parser.add_argument('--work-dir', type=Path, required=True)
     parser.add_argument('--db-config', type=Path)
     parser.add_argument('--feature-limit', type=int, default=0,
                         help='Diagnostic only; zero processes the full corpus')
     parser.add_argument('--output', type=Path)
+    parser.add_argument('--validation-dir', type=Path)
+    parser.add_argument('--fuzz-dir', type=Path)
     parser.add_argument('--count', type=int, default=10000)
     parser.add_argument('--rule-limit', type=int, default=0, help='Diagnostic revalidation limit; zero checks all rules')
     parser.add_argument('--seed', type=int, default=0)
@@ -34,6 +37,10 @@ def main():
         if args.output is None:
             parser.error('fuzz requires --output (a new result directory)')
         run_fuzz(args.work_dir, args.output, db, args.count, args.seed, args.generation_profile)
+    elif args.command == 'export':
+        if args.output is None or args.validation_dir is None or args.fuzz_dir is None:
+            parser.error('export requires --output, --validation-dir and --fuzz-dir')
+        export_bundle(args.work_dir, args.validation_dir, args.fuzz_dir, args.output)
     elif args.command == 'revalidate':
         if args.output is None:
             parser.error('revalidate requires --output (a new result directory)')
