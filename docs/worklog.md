@@ -212,3 +212,13 @@ passed 90/90 expanded target executions and independent evidence audit. It has
 not been imported while snapshot audits run. After reconciliation, the revised
 snapshot requires full validation and a new 10,000-query run; the original
 failure and original run must remain retained. Current evidence is provisional.
+
+Expanded revalidation rejected BIT_XOR double-expression rule
+61e731e3ab9c28bb597b2ed3 on a nested UUID_SHORT multiplication in aggregate
+integer-evaluation context (errno 1690). A UUID_SHORT-side DOUBLE cast candidate
+26db5af5c91e5ab9d92edf18 passed random 90-query execution but still failed the
+exact retained regression, so `runs/mysql-uuid-short-double-repair-001/decision.json`
+explicitly rejects it for import. Decimal conversion at the BIT_XOR input
+executes the exact regression successfully; its full expanded trial is running
+in `runs/mysql-bitxor-numeric-repair-001` (seed 330000). No new repair has been
+imported into the snapshot under audit. Retain this distinction when reconciling.
