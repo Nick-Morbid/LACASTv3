@@ -113,3 +113,20 @@ Revalidation now supports exclusive-lock `--resume`, retaining its immutable
 snapshot and completed results, recording runtime attempts, and archiving an
 incomplete trial. An interruption/resume regression verifies that later changes
 to the source run cannot change the resumed snapshot. Unit tests total 49.
+
+The runtime upgrade was applied at 2026-10-29T13:46:58Z, with a training
+checkpoint and validator resume preserving 46 completed results. The fixed
+202-rule snapshot validation has now finished: 201 accepted, one rejected
+(`4233a4497fca40c8cb0c7cdd`, integerExpr + integerExpr). It failed when a
+nested bitwise expression produced BIGINT UNSIGNED and addition overflowed.
+`full_snapshot_verified` correctly remains false.
+
+A separate repair experiment (`runs/mysql-expanded-repairs-001`) widens both
+integral addition operands to DECIMAL(65,0), preserving variable inputs and
+the + operation. Replacement `7fd5677b6619fcb6b2e09085` passed 90/90 expanded
+executions plus independent target-context audit. Exact replay reproduced
+MySQL error 1690 for the original SQL and succeeded for the repaired SQL,
+whose parse includes the replacement target context. Original failure evidence
+is retained. The repair is NOT merged into the active trainer; after its writer
+exits, replace the rejected rule and its feature mappings/evidence, along with
+the two pending recovered BIT_AND rules, then validate the final full snapshot.
