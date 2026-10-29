@@ -1,7 +1,9 @@
 import hashlib
 import pytest
+import subprocess
+import sys
 
-from lacastv3.delivery import check_evaluation
+from lacastv3.delivery import check_evaluation, copy_runtime_assets
 
 
 def evidence():
@@ -33,3 +35,15 @@ def test_partial_or_mismatched_evidence_cannot_export(index, field, value):
     args[index][field] = value
     with pytest.raises(ValueError):
         check_evaluation(*args)
+
+
+def test_deployment_assets_boot_without_original_worktree(tmp_path):
+    copy_runtime_assets(tmp_path)
+    for name in ('.env.example', 'DEPLOYMENT.md', 'prompts/rules.txt', 'scripts/bootstrap.py',
+                 'scripts/preflight_mysql.py', 'configs/mysql/schema.sql', 'docs/architecture.md'):
+        assert (tmp_path / name).is_file()
+    assert not (tmp_path / '.env').exists()
+    assert not (tmp_path / 'configs/mysql/local.yaml').exists()
+    result = subprocess.run([sys.executable, '-m', 'lacastv3', '--help'],
+                            cwd=tmp_path, check=True, capture_output=True, text=True)
+    assert 'revalidate' in result.stdout

@@ -159,3 +159,14 @@ CURRENT_TIME and CURRENT_TIMESTAMP, including every optional/alternative
 derivation. A scan of the current 459 accepted feature/rule links found no
 violations. Tests total 58. Training continues normally; this additional guard
 will be enforced by the final independent audit without restarting the trainer.
+
+Deployment assets now include public prompt files, initialization/preflight
+scripts, `.env.example`, documentation and an explicit config allowlist. Runtime
+provenance archives include prompts and scripts as well. A regression boots the
+copied CLI from an independent directory without local credentials. Tests: 59.
+
+Standalone smoke in `runs/mysql-deployment-assets-smoke-001` confirmed its
+runtime ROOT is the copied directory, downloaded and checksum-verified ANTLR,
+and executed 20/20 generated SQL on MySQL with zero parser errors. It used an
+explicit external connection config without copying it. This is a deployment
+asset smoke only; the final evidence-gated export has not yet been produced.

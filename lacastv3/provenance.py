@@ -7,6 +7,8 @@ from zipfile import ZipFile, ZIP_DEFLATED
 def capture_runtime(root: Path, output: Path):
     paths = [root / name for name in ('pyproject.toml', 'uv.lock')]
     paths += list((root / 'lacastv3').glob('*.py'))
+    paths += list((root / 'prompts').glob('*.txt'))
+    paths += list((root / 'scripts').glob('*.py'))
     paths += [root / 'configs/mysql' / name for name in
               ('MySQLBase.g4', 'schema.json', 'schema.sql', 'semantics.json', 'web_corpus.json')]
     archive = output / 'runtime-source.zip'

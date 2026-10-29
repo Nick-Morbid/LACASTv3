@@ -10,7 +10,10 @@ def test_runtime_archive_is_allowlisted_and_hashes_exact_bytes(tmp_path):
     output.mkdir()
     (root / 'lacastv3').mkdir(parents=True)
     (root / 'configs/mysql').mkdir(parents=True)
+    (root / 'prompts').mkdir()
+    (root / 'scripts').mkdir()
     names = ['pyproject.toml', 'uv.lock', 'lacastv3/generator.py']
+    names += ['prompts/rules.txt', 'scripts/bootstrap.py']
     names += ['configs/mysql/' + name for name in
               ('MySQLBase.g4', 'schema.json', 'schema.sql', 'semantics.json', 'web_corpus.json')]
     for name in names:

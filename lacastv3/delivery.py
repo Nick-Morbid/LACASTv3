@@ -10,6 +10,21 @@ from .productions import Rule
 from .training import ROOT, save
 
 
+def copy_runtime_assets(output: Path):
+    """Copy public setup/runtime inputs explicitly, never local credentials."""
+    for name in ('README.md', 'DEPLOYMENT.md', 'pyproject.toml', 'uv.lock', '.env.example', '.gitignore'):
+        shutil.copy2(ROOT / name, output / name)
+    shutil.copytree(ROOT / 'lacastv3', output / 'lacastv3', ignore=shutil.ignore_patterns('__pycache__', '*.pyc'))
+    config = output / 'configs/mysql'
+    config.mkdir(parents=True)
+    for name in ('MySQLBase.g4', 'schema.json', 'schema.sql', 'semantics.json', 'web_corpus.json'):
+        shutil.copy2(ROOT / 'configs/mysql' / name, config / name)
+    for folder, pattern in (('scripts', '*.py'), ('prompts', '*.txt'), ('docs', '*.md')):
+        (output / folder).mkdir()
+        for path in (ROOT / folder).glob(pattern):
+            shutil.copy2(path, output / folder / path.name)
+
+
 def check_evaluation(rules_bytes, validation_manifest, validation, fuzz_manifest, fuzz):
     digest = hashlib.sha256(rules_bytes).hexdigest()
     rules = json.loads(rules_bytes)
@@ -68,13 +83,7 @@ def export_bundle(source: Path, validation: Path, fuzz: Path, output: Path):
     save(output / 'rule_map.json', mapping)
     for name in ('MySQLBase.g4', 'schema.json', 'schema.sql', 'semantics.json'):
         shutil.copy2(ROOT / 'configs/mysql' / name, output / name)
-    for name in ('README.md', 'pyproject.toml', 'uv.lock'):
-        shutil.copy2(ROOT / name, output / name)
-    shutil.copytree(ROOT / 'lacastv3', output / 'lacastv3', ignore=shutil.ignore_patterns('__pycache__', '*.pyc'))
-    shutil.copytree(ROOT / 'configs/mysql', output / 'configs/mysql',
-                    ignore=shutil.ignore_patterns('local.yaml'))
-    (output / 'scripts').mkdir()
-    shutil.copy2(ROOT / 'scripts/bootstrap.py', output / 'scripts/bootstrap.py')
+    copy_runtime_assets(output)
     save(output / 'evaluation.json', {'revalidation': vs, 'fuzz': fs, 'environment': fm})
     hashes = {str(path.relative_to(output)).replace('\\', '/'): hashlib.sha256(path.read_bytes()).hexdigest()
               for path in output.rglob('*') if path.is_file()}
