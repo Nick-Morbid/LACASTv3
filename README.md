@@ -97,3 +97,14 @@ code, clean grammar, type/schema configuration, bootstrap script and hashes.
 Local credentials are excluded. The delivery manifest is written only after
 all gates pass. Fuzz execution accuracy remains a measured result, not an
 assertion that every returned value is semantically correct.
+
+After the trainer has stopped, independently verified repairs can be imported:
+
+```sh
+uv run python -m lacastv3 import-evidence --work-dir runs/mysql --trial runs/mysql-expanded-repairs-001/trial --feature-key "Arithmetic Operators::+" --replace-rule 4233a4497fca40c8cb0c7cdd
+```
+
+The import holds the training-directory lock, requires a terminal training
+record, replays the trial audit, backs up prior rules and mappings, and updates
+all affected feature links. Omit `--replace-rule` to add a recovered candidate.
+Import does not replace final full-snapshot revalidation and fuzzing.

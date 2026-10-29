@@ -130,3 +130,11 @@ whose parse includes the replacement target context. Original failure evidence
 is retained. The repair is NOT merged into the active trainer; after its writer
 exits, replace the rejected rule and its feature mappings/evidence, along with
 the two pending recovered BIT_AND rules, then validate the final full snapshot.
+
+Added `import-evidence` for that pending reconciliation. It takes the writer
+lock, requires a terminal training record, audits original and copied trial
+evidence, checkpoints old rules/mappings/events, validates documented-feature
+presence and recompiles before replacing authoritative files. All feature links
+referencing a replaced rule are updated. No import has been performed against
+the running trainer. Tests include active-writer rejection and replacement/link
+checkpointing; 54 tests pass.
