@@ -32,6 +32,7 @@ only that database with the smoke preflight, then start corpus-wide training:
 ```sh
 uv run python scripts/preflight_mysql.py --initialize --output runs/preflight
 uv run python -m lacastv3 train --dbms mysql --work-dir runs/mysql
+uv run python -m lacastv3 audit --work-dir runs/mysql --output runs/mysql-audit
 uv run python -m lacastv3 fuzz --dbms mysql --work-dir runs/mysql --output runs/mysql-fuzz10000 --count 10000
 ```
 
@@ -50,3 +51,10 @@ pilot completed with six accepted rules; this is not the full retraining result.
 The fuzz command executes every generated query, retains all database failures,
 and reports ANTLR parsing errors separately. Its output directory must be new.
 The execution-success rate does not verify the returned SQL result values.
+
+The audit command replays ANTLR parsing for each retained execution sample,
+checks the exact stored production, and recomputes all three 30-query acceptance
+batches. A complete audit also requires all 189 category/signature corpus entries
+and a terminal completion record. `--allow-partial` can inspect an ongoing run
+without claiming completion. Duplicate signatures in different documentation
+categories have separate corpus identities.
