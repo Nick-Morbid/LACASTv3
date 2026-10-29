@@ -190,3 +190,13 @@ replacement by REGEXP_LIKE, omission of NOT, and alternatives that omit REGEXP.
 The active trainer continues unchanged; final independent auditing uses these
 contracts before delivery. Tests: 66 passed. Training last confirmed at 167/189
 with no failed features; this is not a completion claim.
+
+MySQL training naturally exited with code 0 at 2026-10-29T16:57:47Z:
+189/189 corpus entries completed, no failed features, 1,261 retained rules,
+and a matching `training_stopped` event. After the writer exited, evidence
+import reaudited and checkpointed the numeric-addition replacement and the
+two expanded BIT_AND recoveries described above. The resulting snapshot has
+1,263 rules. Full training evidence audit is running in
+`runs/mysql-final-training-audit`; independent expanded per-rule execution
+validation is running in `runs/mysql-final-expanded-validation`. These must
+finish successfully before final 10,000-query evaluation and gated export.
