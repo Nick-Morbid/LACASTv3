@@ -1,0 +1,27 @@
+{
+  "scope": "Completed expanded MySQL SQL execution experiment; full rule revalidation and training evidence audit remain pending.",
+  "server_version": "8.4.11",
+  "generation_profile": "expanded",
+  "seed": 0,
+  "rules_sha256": "acf9dacfa15b490c36f01ab17f57e73220a84b453a5e3071b4e2008fcd32f373",
+  "grammar_sha256": "a09e3767700ee14d4866b180c9c9cf69ec327f1a0e3dfcde41eace70d060ff23",
+  "summary": {
+    "status": "completed",
+    "requested": 10000,
+    "executed": 10000,
+    "passed": 10000,
+    "errors": 0,
+    "accuracy": 1.0,
+    "antlr_errors": 0,
+    "elapsed_seconds": 907.309419499943,
+    "definition": "Database execution success; all generated SQL retained, no target filtering."
+  },
+  "local_evidence_directory": "runs/mysql-reconciled-v2-fuzz10000",
+  "evidence_hashes": {
+    "manifest.json": "ae233187da8d66f9165ad0c8ac3e820d11962352656ff6a4d381330e204e2cfa",
+    "summary.json": "602ba6bb2f0a21e17671b2daf8b7c11e667cab0c66e47afefd85bf8c25ee323e",
+    "sql_results.jsonl": "51dea6f59e3975c4cf59e9af89acd7e2afd0145a8674137682198fbbb498ccc8",
+    "trained_rules.json": "acf9dacfa15b490c36f01ab17f57e73220a84b453a5e3071b4e2008fcd32f373",
+    "LearnedMySQL.g4": "a09e3767700ee14d4866b180c9c9cf69ec327f1a0e3dfcde41eace70d060ff23"
+  }
+}
