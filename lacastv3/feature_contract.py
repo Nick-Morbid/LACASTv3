@@ -24,6 +24,12 @@ def validate_feature(feature, rule):
         if function[1].upper() not in tokens:
             raise ValueError(f'Candidate removed the requested function {function[1]} from a derivation')
         return
+    if re.fullmatch(r'[A-Za-z_][A-Za-z_0-9]*', feature):
+        # SQL permits CURRENT_TIME/CURRENT_TIMESTAMP and other special
+        # functions without parentheses. Their keyword must still be executed.
+        if feature.upper() not in tokens:
+            raise ValueError(f'Candidate removed the requested keyword {feature} from a derivation')
+        return
     symbol = {'N % M': '%', 'expr LIKE pat [ESCAPE \'escape_char\']': 'LIKE',
               'expr NOT LIKE pat [ESCAPE \'escape_char\']': 'NOT LIKE'}.get(feature, feature)
     contracts = {'IS boolean_value': {'IS'}, 'IS NOT boolean_value': {'IS', 'NOT'},

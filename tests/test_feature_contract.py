@@ -10,6 +10,8 @@ from lacastv3.productions import Rule
     ('ABS(x)', '"ABS("? integerAtom ")"?'),
     ('IS NOT NULL', 'integerAtom "IS NULL"'),
     ('ABS(x)', '"CONCAT(\'ABS\'," integerAtom ")"'),
+    ('CURRENT_TIME', '"CAST(\'12:00:00\' AS TIME)"'),
+    ('CURRENT_TIMESTAMP', '("CURRENT_TIMESTAMP()" | "NULL")'),
 ])
 def test_feature_cannot_disappear_from_an_alternative(feature, production):
     with pytest.raises(ValueError, match='removed'):
@@ -21,6 +23,7 @@ def test_feature_cannot_disappear_from_an_alternative(feature, production):
     ('ABS(x)', '"ABS(" (integerAtom | doubleAtom) ")"'),
     ('IS NOT NULL', 'integerAtom "IS NOT NULL"'),
     ('N % M', 'integerAtom "% 3"'),
+    ('CURRENT_TIMESTAMP', '"CURRENT_TIMESTAMP(3)"'),
 ])
 def test_documented_operation_is_guaranteed(feature, production):
     validate_feature(feature, Rule('r', 'integer', production))

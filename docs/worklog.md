@@ -153,3 +153,9 @@ literals and real operator differences untouched. A real historical trial
 (`413076db57ff346764288880`) reaudited successfully. On 389 learned rules and
 20 retained SQL, parser contexts matched exactly and parse runtime changed
 from 6.70s to 2.14s (`runs/compiler-choice-benchmark-001`). Tests total 55.
+
+Feature-presence auditing also covers bare-keyword functions such as
+CURRENT_TIME and CURRENT_TIMESTAMP, including every optional/alternative
+derivation. A scan of the current 459 accepted feature/rule links found no
+violations. Tests total 58. Training continues normally; this additional guard
+will be enforced by the final independent audit without restarting the trainer.
