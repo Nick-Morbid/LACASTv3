@@ -200,3 +200,15 @@ two expanded BIT_AND recoveries described above. The resulting snapshot has
 `runs/mysql-final-training-audit`; independent expanded per-rule execution
 validation is running in `runs/mysql-final-expanded-validation`. These must
 finish successfully before final 10,000-query evaluation and gated export.
+
+The 10,000-query expanded fuzz run started against the same fixed 1,263-rule
+snapshot while validation continues (`runs/mysql-final-fuzz10000`). Its first
+execution failure, query 404, combines binary left-shift output with the learned
+`blobExpr NOT LIKE charAtom` rule (97ee48ed2751d5da867e6fbe), causing MySQL
+errno 3854 on binary-to-UTF8 conversion. The exact error was reproduced; casting
+the variable pattern to BINARY preserves NOT LIKE and executes successfully.
+Replacement 7dc7500f6926d175e92319b9 in `runs/mysql-binary-like-repair-001`
+passed 90/90 expanded target executions and independent evidence audit. It has
+not been imported while snapshot audits run. After reconciliation, the revised
+snapshot requires full validation and a new 10,000-query run; the original
+failure and original run must remain retained. Current evidence is provisional.
