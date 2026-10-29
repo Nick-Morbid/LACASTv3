@@ -70,3 +70,9 @@ the delivered grammar before writing a delivery manifest. Local credentials
 are excluded from copied configurations. Unit tests total 36, including gates
 against partial runs, baseline evidence and mismatched snapshots/environments.
 No final bundle has been exported: the full runtime gates remain outstanding.
+
+Fixed fuzz provenance under concurrent training: rules are now read exactly
+once and retained, so grammar inputs and manifest hashes cannot describe
+different trainer revisions. New fuzz/revalidation processes archive an
+allowlisted runtime-source ZIP and hash public configurations. Credentials
+are excluded. Existing running processes keep their original code snapshots.

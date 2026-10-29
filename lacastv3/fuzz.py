@@ -10,6 +10,7 @@ from .compiler import compile_rules
 from .profiles import generator_class
 from .parser import SQLParser, ParseFailure
 from .productions import Rule
+from .provenance import capture_runtime
 from .training import ROOT, save
 
 
@@ -18,10 +19,13 @@ def run_fuzz(source: Path, output: Path, db, count=10000, seed=0, generation_pro
         raise ValueError('Count must be positive')
     if output.exists():
         raise FileExistsError(f'Refusing to overwrite an existing result: {output}')
-    rules = [Rule(**item) for item in json.loads((source / 'trained_rules.json').read_text())]
+    rules_bytes = (source / 'trained_rules.json').read_bytes()
+    rules = [Rule(**item) for item in json.loads(rules_bytes)]
     if not rules:
         raise ValueError('No learned rules available for fuzzing')
     output.mkdir(parents=True)
+    (output / 'trained_rules.json').write_bytes(rules_bytes)
+    runtime = capture_runtime(ROOT, output)
     grammar = output / 'LearnedMySQL.g4'
     mapping = compile_rules(ROOT / 'configs/mysql/MySQLBase.g4', rules, grammar)
     syntax = SQLParser(grammar, ROOT / 'vendor/antlr-4.13.2-complete.jar', output / 'parser', mapping)
@@ -34,8 +38,9 @@ def run_fuzz(source: Path, output: Path, db, count=10000, seed=0, generation_pro
     manifest = {'started_at': datetime.now(timezone.utc).isoformat(), 'server_version': version,
                 'database': database, 'source': str(source.resolve()), 'seed': seed, 'count': count,
                 'generation_profile': generation_profile,
+                'runtime': runtime,
                 'grammar_sha256': hashlib.sha256(grammar.read_bytes()).hexdigest(),
-                'rules_sha256': hashlib.sha256((source / 'trained_rules.json').read_bytes()).hexdigest()}
+                'rules_sha256': hashlib.sha256(rules_bytes).hexdigest()}
     save(output / 'manifest.json', manifest)
     started = time.monotonic()
     executed = passed = syntax_errors = 0

@@ -5,7 +5,8 @@ import json
 from pathlib import Path
 
 from .audit import verify_trial
-from .training import Trainer, save
+from .training import ROOT, Trainer, save
+from .provenance import capture_runtime
 
 
 def run_revalidation(source: Path, output: Path, db, seed=0, rule_limit=0):
@@ -17,6 +18,7 @@ def run_revalidation(source: Path, output: Path, db, seed=0, rule_limit=0):
     snapshot = (source / 'trained_rules.json').read_bytes()
     output.mkdir(parents=True)
     (output / 'trained_rules.json').write_bytes(snapshot)
+    runtime = capture_runtime(ROOT, output)
     trainer = Trainer(output, db, generation_profile='expanded')
     with db.connect() as conn:
         with conn.cursor() as cursor:
@@ -26,7 +28,8 @@ def run_revalidation(source: Path, output: Path, db, seed=0, rule_limit=0):
                 'rules_sha256': hashlib.sha256(snapshot).hexdigest(),
                 'generation_profile': 'expanded', 'server_version': version,
                 'database': database, 'sql_mode': sql_mode, 'seed': seed,
-                'snapshot_rules': len(trainer.accepted), 'rule_limit': rule_limit}
+                'snapshot_rules': len(trainer.accepted), 'rule_limit': rule_limit,
+                'runtime': runtime}
     save(output / 'manifest.json', manifest)
     rules = trainer.accepted[:rule_limit] if rule_limit else trainer.accepted
     results = []
