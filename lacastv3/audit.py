@@ -5,7 +5,7 @@ import json
 from pathlib import Path
 
 from .parser import SQLParser
-from .compiler import compile_rules
+from .compiler import compile_rules, normalized_definition
 from .productions import Rule
 from .features import feature_key, normalize_events, upgrade_state
 from .feature_contract import validate_feature
@@ -22,7 +22,7 @@ def verify_trial(trial: Path, rule: Rule, cache: Path):
                                if line.startswith('learnedRule0:'))
     actual_definition = next(line for line in (trial / 'LearnedMySQL.g4').read_text().splitlines()
                              if line.startswith('learnedRule0:'))
-    if expected_definition != actual_definition:
+    if normalized_definition(expected_definition) != normalized_definition(actual_definition):
         raise ValueError('Retained grammar does not contain the saved target production')
     parser = SQLParser(trial / 'LearnedMySQL.g4', ROOT / 'vendor/antlr-4.13.2-complete.jar',
                        cache, {'learnedRule0': rule.id})

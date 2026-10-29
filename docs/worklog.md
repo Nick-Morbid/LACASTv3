@@ -145,3 +145,11 @@ executions succeeded, zero ANTLR errors, 107.73 seconds. Every generated SQL
 was retained and executed, with no target filtering or failure resampling.
 This is an intermediate 1,000-query diagnostic, not the final 10,000-query
 evaluation and not evidence overturning the known overflow rejection.
+
+Further removed duplicate operand alternatives inside a production (typed
+overloads can otherwise emit `(expression | expression)`). Historical trial
+audit normalizes only redundant bare-expression groups and leaves quoted SQL
+literals and real operator differences untouched. A real historical trial
+(`413076db57ff346764288880`) reaudited successfully. On 389 learned rules and
+20 retained SQL, parser contexts matched exactly and parse runtime changed
+from 6.70s to 2.14s (`runs/compiler-choice-benchmark-001`). Tests total 55.

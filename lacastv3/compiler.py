@@ -21,6 +21,15 @@ def terminal(text):
     return "'" + text.replace('\\', '\\\\').replace("'", "\\'") + "'"
 
 
+def normalized_definition(definition):
+    """Remove redundant typed-operand choices without touching SQL literals."""
+    chunks = re.split(r"('(?:\\.|[^'\\])*')", definition)
+    for index in range(0, len(chunks), 2):
+        chunks[index] = re.sub(r'\(\s*expression(?:\s*\|\s*expression)*\s*\)',
+                               'expression', chunks[index])
+    return ''.join(chunks)
+
+
 def compile_rules(base: Path, rules: list[Rule], destination: Path):
     if len({rule.id for rule in rules}) != len(rules):
         raise ValueError('Duplicate rule IDs')
@@ -43,7 +52,8 @@ def compile_rules(base: Path, rules: list[Rule], destination: Path):
         if node.kind == 'sequence':
             return ' '.join(emit(child) for child in node.children)
         if node.kind == 'choice':
-            return '(' + ' | '.join(emit(child) for child in node.children) + ')'
+            alternatives = list(dict.fromkeys(emit(child) for child in node.children))
+            return alternatives[0] if len(alternatives) == 1 else '(' + ' | '.join(alternatives) + ')'
         if node.kind == 'repeat':
             return '(' + emit(node.children[0]) + ')' + node.value
         raise ValueError(node.kind)
@@ -59,9 +69,10 @@ def compile_rules(base: Path, rules: list[Rule], destination: Path):
         seen = set()
         active_names = []
         for name, definition in zip(rule_map, definitions):
-            if definition not in seen:
+            identity = normalized_definition(definition)
+            if identity not in seen:
                 active_names.append(name)
-                seen.add(definition)
+                seen.add(identity)
         source = source.replace('primary\n    : literal', 'primary\n    : learnedPrimary\n    | literal')
         source += '\nlearnedPrimary: ' + ' | '.join(f"LP {name} RP" for name in active_names) + ';\n'
         for name, definition in zip(rule_map, definitions):

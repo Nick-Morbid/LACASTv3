@@ -2,7 +2,7 @@ from pathlib import Path
 
 import pytest
 
-from lacastv3.compiler import compile_rules
+from lacastv3.compiler import compile_rules, normalized_definition, terminal
 from lacastv3.coverage import GeneratedSQL, target_samples
 from lacastv3.parser import SQLParser, ParseFailure
 from lacastv3.productions import Rule, parse_production
@@ -84,6 +84,15 @@ def test_duplicate_syntax_keeps_first_target_context_and_all_definitions(tmp_pat
     mapping = compile_rules(ROOT / 'configs/mysql/MySQLBase.g4', list(reversed(rules)), grammar)
     syntax = SQLParser(grammar, ROOT / 'vendor/antlr-4.13.2-complete.jar', tmp_path / 'cache', mapping)
     assert syntax.parse('SELECT (ABS(1));').rule_ids == {'alias-int'}
+
+
+def test_definition_normalization_only_removes_redundant_operand_choices():
+    old = "learnedRule0: (expression | expression) '+' expression;"
+    new = "learnedRule0: expression '+' expression;"
+    assert normalized_definition(old) == normalized_definition(new)
+    literal = 'learnedRule0: ' + terminal("'(expression | expression)'") + ';'
+    assert normalized_definition(literal) == literal
+    assert normalized_definition(old) != normalized_definition(new.replace("'+'", "'-'"))
 
 
 def test_productions_cannot_smuggle_another_statement(tmp_path):
