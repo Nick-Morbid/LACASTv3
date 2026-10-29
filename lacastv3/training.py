@@ -19,6 +19,7 @@ from .database import MySQLDatabase
 from .generator import SQLGenerator
 from .parser import SQLParser
 from .productions import Rule
+from .features import feature_key, feature_directory, normalize_events, upgrade_state, migrate_feature_directories
 
 ROOT = Path(__file__).resolve().parents[1]
 
@@ -66,11 +67,18 @@ class Trainer:
             'created_at': datetime.now(timezone.utc).isoformat(), 'elapsed_seconds': 0,
         }
         self.accepted = [Rule(**data) for data in json.loads(self.rules_path.read_text())] if self.rules_path.exists() else []
-        self.previous_events = [json.loads(line) for line in self.events.read_text(encoding='utf-8').splitlines()] if self.events.exists() else []
+        raw_events = [json.loads(line) for line in self.events.read_text(encoding='utf-8').splitlines()] if self.events.exists() else []
+        self.previous_events = normalize_events(raw_events)
+        if self.state.get('schema_version', 1) < 2:
+            self.state = upgrade_state(self.state, self.previous_events)
+            migrate_feature_directories(directory, self.previous_events)
         self.state['llm_calls'] = sum(event['event'] == 'llm_call' for event in self.previous_events)
+        self.current_feature_key = None
         self.client = None
 
     def event(self, kind, **data):
+        if 'feature' in data and self.current_feature_key is not None:
+            data.setdefault('feature_key', self.current_feature_key)
         with self.events.open('a', encoding='utf-8') as stream:
             stream.write(json.dumps({'time': datetime.now(timezone.utc).isoformat(),
                                      'event': kind, **data}, ensure_ascii=False) + '\n')
@@ -185,19 +193,21 @@ class Trainer:
         visited = 0
         try:
             for category, feature, description in features:
-                if feature in self.state['completed_features']:
+                key = feature_key(category, feature)
+                if key in self.state['completed_features']:
                     continue
                 if self.feature_limit and visited >= self.feature_limit:
                     break
                 visited += 1
                 self.state['current_feature'] = feature
-                feature_id = hashlib.sha256(feature.encode()).hexdigest()[:16]
-                feature_dir = self.directory / 'features' / feature_id
+                self.state['current_feature_key'] = key
+                self.current_feature_key = key
+                feature_dir = feature_directory(self.directory, key)
                 feature_dir.mkdir(parents=True, exist_ok=True)
                 print(f'Training feature: {feature}', flush=True)
                 self.event('feature_started', feature=feature, category=category)
                 accepted_ids = [event['rule_id'] for event in self.previous_events
-                                if event['event'] == 'rule_verdict' and event.get('feature') == feature
+                                if event['event'] == 'rule_verdict' and event.get('feature_key') == key
                                 and event.get('passed') and event['rule_id'] in {rule.id for rule in self.accepted}]
                 feedback = None
                 for refinement in range(4):
@@ -230,14 +240,15 @@ class Trainer:
                         break
                     feedback = failed
                 if accepted_ids:
-                    if feature not in self.state['completed_features']:
-                        self.state['completed_features'].append(feature)
-                    if feature in self.state['failed_features']:
-                        self.state['failed_features'].remove(feature)
-                    save(feature_dir / 'accepted.json', {'feature': feature, 'rule_ids': sorted(set(accepted_ids))})
+                    if key not in self.state['completed_features']:
+                        self.state['completed_features'].append(key)
+                    if key in self.state['failed_features']:
+                        self.state['failed_features'].remove(key)
+                    save(feature_dir / 'accepted.json', {'feature': feature, 'feature_key': key,
+                                                        'rule_ids': sorted(set(accepted_ids))})
                 else:
-                    if feature not in self.state['failed_features']:
-                        self.state['failed_features'].append(feature)
+                    if key not in self.state['failed_features']:
+                        self.state['failed_features'].append(key)
                 self.state['elapsed_seconds'] = prior_elapsed + time.monotonic() - start
                 save(self.state_path, self.state)
                 print(f'Feature finished: {feature}; accepted={len(set(accepted_ids))}; completed={len(self.state["completed_features"])}', flush=True)
