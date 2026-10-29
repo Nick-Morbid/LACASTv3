@@ -222,3 +222,13 @@ explicitly rejects it for import. Decimal conversion at the BIT_XOR input
 executes the exact regression successfully; its full expanded trial is running
 in `runs/mysql-bitxor-numeric-repair-001` (seed 330000). No new repair has been
 imported into the snapshot under audit. Retain this distinction when reconciling.
+
+BIT_XOR replacement 8dd15b6065cc72ce0628374f completed 90/90 expanded
+target-confirmed executions and independent audit, in addition to the exact
+aggregate regression. Pending imports after the current snapshot experiments:
+`runs/mysql-binary-like-repair-001/trial`, replacing 97ee48ed2751d5da867e6fbe
+under `String Comparison Functions and Operators::expr NOT LIKE pat [ESCAPE 'escape_char']`;
+and `runs/mysql-bitxor-numeric-repair-001/trial`, replacing 61e731e3ab9c28bb597b2ed3
+under `Aggregate Function Descriptions::BIT_XOR(expr) [over_clause]`.
+Keep original failed snapshot evidence; revised results need new full revalidation,
+training evidence audit, and 10,000-query evaluation before export.
