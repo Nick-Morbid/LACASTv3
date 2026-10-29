@@ -6,7 +6,11 @@ from .compiler import SQL_TOKENS
 
 def guaranteed_tokens(node):
     if node.kind == 'literal':
-        return {token.upper() for token in SQL_TOKENS.findall(node.value)}
+        # The MySQL corpus explicitly documents REGEXP and RLIKE as synonyms.
+        # Normalize before choice intersections so either spelling is guaranteed
+        # in every branch; quoted SQL values remain opaque lexer tokens.
+        return {'REGEXP' if token.upper() == 'RLIKE' else token.upper()
+                for token in SQL_TOKENS.findall(node.value)}
     if node.kind == 'reference':
         return set()
     children = [guaranteed_tokens(child) for child in node.children]

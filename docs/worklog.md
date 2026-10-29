@@ -355,3 +355,21 @@ progress and failures remain intact, with explicit superseded.json records;
 they cannot certify the repaired snapshot. The active acceptance processes are
 training-audit-r2 Python PID 43844 and expanded-validation Python PID 34344.
 This cleanup was due to known superseded evidence, not an observation timeout.
+
+A proactive full feature-link/contract precheck found two historical RLIKE
+productions linked to expr REGEXP pat. The corpus explicitly says "REGEXP and
+RLIKE are synonyms" and documents both spellings in that entry. Treating
+RLIKE as removal of the requested operator was a contract false rejection.
+Guaranteed-token calculation now canonicalizes that documented operator alias
+before alternative intersections. Regression tests still reject missing NOT,
+quoted 'RLIKE' values, disappearing branches and REGEXP_LIKE function
+substitution for the requested operator syntax. All 73 tests passed.
+
+The metadata precheck now validates all 189 expected/completed/linked features
+and every linked rule without contract failures or missing links. Rules and
+grammar are unchanged. The r2 audit process (verified PID 43844) retained its
+old contract implementation and would falsely reject the two aliases at the
+final metadata gate; it was deliberately stopped with an explicit interrupted
+reason, preserving progress. Replacement full audit runs at
+runs/mysql-reconciled-v2-training-audit-r3 (exec session 58397). Existing
+expanded rule validation continues; completed 10,000-query evidence is unchanged.

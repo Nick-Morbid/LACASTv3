@@ -16,6 +16,8 @@ from lacastv3.productions import Rule
     ('expr REGEXP pat', '"REGEXP_LIKE(" textAtom ", \'a\')"'),
     ('expr NOT REGEXP pat', 'textAtom " REGEXP \'a\'"'),
     ('expr REGEXP pat', '(textAtom " REGEXP \'a\'" | "TRUE")'),
+    ('expr NOT REGEXP pat', 'textAtom " RLIKE \'a\'"'),
+    ('expr REGEXP pat', '"CONCAT(\'RLIKE\'," textAtom ")"'),
 ])
 def test_feature_cannot_disappear_from_an_alternative(feature, production):
     with pytest.raises(ValueError, match='removed'):
@@ -31,6 +33,9 @@ def test_feature_cannot_disappear_from_an_alternative(feature, production):
     ('CASE value WHEN value THEN result END', '"CASE WHEN TRUE THEN" integerAtom "END"'),
     ('expr REGEXP pat', 'textAtom " REGEXP \'a\'"'),
     ('expr NOT REGEXP pat', 'textAtom " NOT REGEXP \'a\'"'),
+    ('expr REGEXP pat', 'textAtom " RLIKE " textAtom'),
+    ('expr NOT REGEXP pat', 'textAtom " NOT RLIKE " textAtom'),
+    ('expr REGEXP pat', '(textAtom " REGEXP \'a\'" | textAtom " RLIKE \'a\'")'),
 ])
 def test_documented_operation_is_guaranteed(feature, production):
     validate_feature(feature, Rule('r', 'integer', production))
