@@ -340,3 +340,18 @@ and its evidence retained. A fresh full audit is running in
 runs/mysql-reconciled-v2-training-audit-r2 (exec session 14167). Other snapshot
 validation and fuzz processes continue unchanged. Do not use the interrupted
 audit as acceptance evidence; the new audit must finish successfully.
+
+The repaired snapshot's training audit has now replayed all formerly
+misreported equality rules successfully: 196/1,263 verified, zero failures at
+that checkpoint; it subsequently reached 200 verified. The independent static
+definition precheck also matched all 1,263 retained target definitions. This
+static check does not replace parser-context or database execution evidence.
+
+Original-snapshot audit PID 7628 and revalidation PID 17048 were independently
+identified by complete command lines and deliberately stopped as superseded:
+their snapshot contains the three confirmed replaced rules and the repaired
+snapshot already has independent full acceptance jobs. Original partial
+progress and failures remain intact, with explicit superseded.json records;
+they cannot certify the repaired snapshot. The active acceptance processes are
+training-audit-r2 Python PID 43844 and expanded-validation Python PID 34344.
+This cleanup was due to known superseded evidence, not an observation timeout.
