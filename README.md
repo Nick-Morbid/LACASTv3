@@ -44,9 +44,17 @@ for the complete 189-entry MySQL corpus. Training retains three batches of 30
 target-confirmed SQL statements per candidate and writes the SQL, derivation,
 execution errors and isolated-error attribution for audit.
 
-The current initial end-to-end preflight ran 100/100 SQL successfully against
-MySQL 8.4.11 with ONLY_FULL_GROUP_BY enabled. One real documentation-based AVG
-pilot completed with six accepted rules; this is not the full retraining result.
+The fresh MySQL training run completed all 189 corpus entries with no failed
+features. The repaired candidate snapshot contains 1,263 learned rules in
+`runs/mysql-reconciled-v2`; three replacements have independently retained
+acceptance evidence. The original training directory is preserved separately.
+
+The repaired snapshot executed 10,000/10,000 generated SQL successfully against
+MySQL 8.4.11, with zero ANTLR errors. Hashes and retained-evidence locations are
+recorded in `docs/results/mysql-reconciled-v2-fuzz.json`. Full training-evidence
+audit and expanded per-rule execution revalidation remain in progress. These
+results do not yet certify a final deployment bundle; the export gates below
+still require both complete audits.
 
 The fuzz command executes every generated query, retains all database failures,
 and reports ANTLR parsing errors separately. Its output directory must be new.
