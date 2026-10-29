@@ -305,3 +305,20 @@ audit. The complete test suite passed 67 tests. Existing audit processes keep
 their originally loaded implementation. Reconciliation remains live: BIT_XOR
 passed its first evidence replay and created an import checkpoint; copied
 trial replay is still running before authoritative candidate replacement.
+
+All three verified replacements have now been reconciled into the independent
+runs/mysql-reconciled-v2 evidence snapshot. Direct set comparison confirms
+exactly the intended three removed IDs and three added IDs, 1,263 rules before
+and after, and the original source rules hash remains unchanged. Reconciliation
+exited naturally with code 0. Fresh full-snapshot jobs actually launched and
+were independently confirmed alive by complete process command lines:
+- training audit: runs/mysql-reconciled-v2-training-audit (Python PID 17168);
+- expanded per-rule execution validation:
+  runs/mysql-reconciled-v2-expanded-validation (Python PID 34344);
+- 10,000 expanded SQL execution evaluation:
+  runs/mysql-reconciled-v2-fuzz10000 (Python PID 53020).
+At first observation: training audit verified 19/1,263 with zero failures,
+expanded validation passed its first two rules, and fuzz passed its first 100
+executions. These are new snapshot experiments; old counts are not carried
+over. See runs/mysql-reconciled-v2/validation-jobs.json and each adjacent .log
+for actual handles/output. All final gates and deployment export remain pending.
