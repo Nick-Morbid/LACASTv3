@@ -1,0 +1,104 @@
+{
+  "scope": "Independent repair acceptance and completed imports; full v3 validation and fuzzing remain in progress.",
+  "rules": 1263,
+  "rules_sha256": "f77b634c17e722cd73c99e7d8377d100eb101ec470253cade06d98e8a9bc9aff",
+  "parent_rules_sha256": "acf9dacfa15b490c36f01ab17f57e73220a84b453a5e3071b4e2008fcd32f373",
+  "repairs": [
+    {
+      "replaced_rule_id": "04816fa1ec13dc57c01469c5",
+      "rule": {
+        "id": "0dfd3f66cbd7cf651f7439fc",
+        "return_type": "integer",
+        "production": "charExpr \" REGEXP NULLIF(\" charExpr \", '')\"",
+        "aggregate": false
+      },
+      "argument_domain": "Empty regex patterns become SQL NULL; nonempty patterns are unchanged.",
+      "batches": [
+        {
+          "batch": 0,
+          "target_sql": 30,
+          "accuracy": 1.0,
+          "target_errors": 0
+        },
+        {
+          "batch": 1,
+          "target_sql": 30,
+          "accuracy": 1.0,
+          "target_errors": 0
+        },
+        {
+          "batch": 2,
+          "target_sql": 30,
+          "accuracy": 1.0,
+          "target_errors": 0
+        }
+      ],
+      "trial_directory": "runs\\mysql-regexp-empty-pattern-repair-002\\trial",
+      "audit_sha256": "6ab745437deb2a8426577ac35faebb3355105ac57899ff997b5b5795b9aea847"
+    },
+    {
+      "replaced_rule_id": "0477f5451960cbbf5b1dddd3",
+      "rule": {
+        "id": "3e7b668d2b7096822684582e",
+        "return_type": "integer",
+        "production": "\"CONVERT(\" integerExpr \" USING utf8mb4) REGEXP NULLIF(CONVERT(\" charExpr \" USING utf8mb4), '')\"",
+        "aggregate": false
+      },
+      "argument_domain": "Convert operands to utf8mb4 and turn empty patterns into NULL; preserve nonempty patterns.",
+      "batches": [
+        {
+          "batch": 0,
+          "target_sql": 30,
+          "accuracy": 1.0,
+          "target_errors": 0
+        },
+        {
+          "batch": 1,
+          "target_sql": 30,
+          "accuracy": 1.0,
+          "target_errors": 0
+        },
+        {
+          "batch": 2,
+          "target_sql": 30,
+          "accuracy": 1.0,
+          "target_errors": 0
+        }
+      ],
+      "trial_directory": "runs\\mysql-regexp-charset-repair-001\\trial",
+      "audit_sha256": "69a9d8310ba1c2f8c5b7254060ece774f4945a83ab2f0c21557dd58846457a86"
+    },
+    {
+      "replaced_rule_id": "d54adabf3f243d65acf2bdb8",
+      "rule": {
+        "id": "84d7f90989acc964d6893b57",
+        "return_type": "integer",
+        "production": "\"CONVERT(\" blobExpr \" USING utf8mb4) REGEXP CONVERT(CAST(\" regexpatternAtom \" AS BINARY) USING utf8mb4)\"",
+        "aggregate": false
+      },
+      "argument_domain": "Variable BLOB subjects converted to utf8mb4; BLOB patterns constructed from valid varied regex patterns, not arbitrary invalid bytes.",
+      "batches": [
+        {
+          "batch": 0,
+          "target_sql": 30,
+          "accuracy": 1.0,
+          "target_errors": 0
+        },
+        {
+          "batch": 1,
+          "target_sql": 30,
+          "accuracy": 1.0,
+          "target_errors": 0
+        },
+        {
+          "batch": 2,
+          "target_sql": 30,
+          "accuracy": 1.0,
+          "target_errors": 0
+        }
+      ],
+      "trial_directory": "runs\\mysql-regexp-blob-pattern-repair-001\\trial",
+      "audit_sha256": "16d04a202bba97d31c8d8f4d4e926f5b4fc248b90a262a9ceb84b39f6018d904"
+    }
+  ]
+}
