@@ -377,3 +377,7 @@ expanded rule validation continues; completed 10,000-query evidence is unchanged
 ### 2026-10-30 Windows checkpoint replacement recovery
 Expanded revalidation exited after rule 903 passed because Windows denied atomic progress.json replacement (WinError 5). The persisted checkpoint retained 902 verified results; the interrupted summary retained 903. Added bounded PermissionError retries around atomic replacement, preserving the old checkpoint on persistent denial. Two regression tests exercise transient and permanent denial; full suite: 75 passed. Resumed the same immutable snapshot from its persisted checkpoint, archiving the uncheckpointed trial through the existing resume path. Resumed process pair: 21232/44480; subsequently passed rule 905. Training evidence audit remains running with 1218 verified and zero failures. This is a persistence recovery, with no rule, generator, grammar or acceptance-threshold change.
 
+
+### 2026-10-30 Full repaired training audit completed
+Training audit r3 completed naturally: full_run_verified=true; 1263/1263 rules verified; 189/189 corpus features completed; no rule failures, feature-contract failures or missing feature links. Exact retained ANTLR target contexts were replayed. Compact evidence and SHA256 values are in docs/results/mysql-reconciled-v2-training-audit.json. Expanded execution revalidation remains pending; final deployment is not yet certified.
+
