@@ -16,9 +16,11 @@ def parser(tmp_path_factory):
     grammar = directory / 'LearnedMySQL.g4'
     mapping = compile_rules(ROOT / 'configs/mysql/MySQLBase.g4', [
         Rule('abs-int', 'integer', '"ABS(" integerAtom ")"'),
+        Rule('epsilon', 'double', 'doubleAtom "+ 1e-6"'),
         Rule('add-int', 'integer', 'integerAtom "+" integerAtom'),
         Rule('round-int', 'double', '"ROUND(" doubleAtom ", 1)"'),
         Rule('date-format', 'text', '"DATE_FORMAT(" dateAtom ", \'%Y\')"'),
+        Rule('pad-bit', 'blob', '"BIT_AND(RPAD(" blobAtom ", 1, 0x00))"', True),
     ], grammar)
     return SQLParser(grammar, ROOT / 'vendor/antlr-4.13.2-complete.jar',
                      directory / 'cache', mapping)
@@ -58,6 +60,9 @@ def test_fixed_literals_do_not_break_generic_tokens(parser):
     assert 'round-int' in parser.parse('SELECT (ROUND(1, 1)) LIMIT 1;').rule_ids
     assert parser.parse("SELECT '%Y', 1 LIMIT 1;")
     assert 'date-format' in parser.parse("SELECT (DATE_FORMAT(CAST('2024-01-01' AS DATE), '%Y'));").rule_ids
+    assert parser.parse("SELECT CAST('abc' AS CHAR(1)), 0x00, 0b1, .5 LIMIT 1;")
+    assert 'pad-bit' in parser.parse("SELECT (BIT_AND(RPAD(X'61', 1, 0x00))) FROM table1;").rule_ids
+    assert 'epsilon' in parser.parse('SELECT (1.5 + 1e-6);').rule_ids
 
 
 def test_sqlcraft_annotations_are_rejected():

@@ -66,6 +66,8 @@ class Trainer:
             'created_at': datetime.now(timezone.utc).isoformat(), 'elapsed_seconds': 0,
         }
         self.accepted = [Rule(**data) for data in json.loads(self.rules_path.read_text())] if self.rules_path.exists() else []
+        self.previous_events = [json.loads(line) for line in self.events.read_text(encoding='utf-8').splitlines()] if self.events.exists() else []
+        self.state['llm_calls'] = sum(event['event'] == 'llm_call' for event in self.previous_events)
         self.client = None
 
     def event(self, kind, **data):
@@ -194,7 +196,9 @@ class Trainer:
                 feature_dir.mkdir(parents=True, exist_ok=True)
                 print(f'Training feature: {feature}', flush=True)
                 self.event('feature_started', feature=feature, category=category)
-                accepted_ids = []
+                accepted_ids = [event['rule_id'] for event in self.previous_events
+                                if event['event'] == 'rule_verdict' and event.get('feature') == feature
+                                and event.get('passed') and event['rule_id'] in {rule.id for rule in self.accepted}]
                 feedback = None
                 for refinement in range(4):
                     try:

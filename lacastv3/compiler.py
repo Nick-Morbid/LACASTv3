@@ -5,7 +5,16 @@ import re
 from .productions import Rule
 
 
-SQL_TOKENS = re.compile(r"'(?:''|\\.|[^'\\])*'|`(?:``|[^`])*`|[a-zA-Z_][a-zA-Z_0-9$]*|[0-9]+(?:\.[0-9]+)?|<=>|<>|!=|<=|>=|<<|>>|&&|\|\||[^\s]")
+SQL_TOKENS = re.compile(
+    r"[bBxX]'(?:''|\\.|[^'\\])*'|0[xX][0-9a-fA-F]+|0[bB][01]+|"
+    r"'(?:''|\\.|[^'\\])*'|`(?:``|[^`])*`|"
+    r"(?:[0-9]+\.[0-9]*|\.[0-9]+|[0-9]+)(?:[eE][+-]?[0-9]+)?|"
+    r"[a-zA-Z_][a-zA-Z_0-9$]*|<=>|->>|->|:=|<>|!=|<=|>=|<<|>>|&&|\|\||[^\s]"
+)
+SQL_VALUE = re.compile(
+    r"(?:[bBxX])?'(?:''|\\.|[^'\\])*'|0[xX][0-9a-fA-F]+|0[bB][01]+|"
+    r"(?:[0-9]+\.[0-9]*|\.[0-9]+|[0-9]+)(?:[eE][+-]?[0-9]+)?"
+)
 
 
 def terminal(text):
@@ -51,8 +60,7 @@ def compile_rules(base: Path, rules: list[Rule], destination: Path):
         words = sorted(token for token in literal_tokens
                        if re.fullmatch(r'[A-Za-z_][A-Za-z_0-9]*', token)
                        and token.upper() not in base_keywords)
-        values = sorted(token for token in literal_tokens
-                        if token.startswith(("'", '`')) or re.fullmatch(r'[0-9]+(?:\.[0-9]+)?', token))
+        values = sorted(token for token in literal_tokens if SQL_VALUE.fullmatch(token))
         integers = sorted(token for token in literal_tokens if re.fullmatch(r'[0-9]+', token))
         if words:
             source = source.replace('identifier: IDENTIFIER | QUOTED_IDENTIFIER;',
@@ -60,8 +68,9 @@ def compile_rules(base: Path, rules: list[Rule], destination: Path):
         if values:
             source = source.replace("| 'FALSE';", "| 'FALSE' | " + ' | '.join(map(terminal, values)) + ';')
         if integers:
-            source = source.replace('limitClause: \'LIMIT\' INTEGER (\'OFFSET\' INTEGER | COMMA INTEGER)?;',
-                "limitClause: 'LIMIT' integerLiteral ('OFFSET' integerLiteral | COMMA integerLiteral)?;")
+            parser_section, lexer_section = source.split('\nLP:', 1)
+            parser_section = re.sub(r'\bINTEGER\b', 'integerLiteral', parser_section)
+            source = parser_section + '\nLP:' + lexer_section
             source += 'integerLiteral: INTEGER | ' + ' | '.join(map(terminal, integers)) + ';\n'
     destination.parent.mkdir(parents=True, exist_ok=True)
     if destination.stem != base.stem:
