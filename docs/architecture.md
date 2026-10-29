@@ -36,12 +36,16 @@
 - [x] Reject SQLCraft annotations in new grammar and prompts; no SQLCraft JAR
       or socket server required by the runtime.
 - [x] Dedicated MySQL database initialized and its actual version recorded (8.4.11).
-- [ ] Retrain every entry of the 189-item MySQL corpus; audit full rule samples.
+- [x] Retrain every entry of the 189-item MySQL corpus; audit full rule samples.
+      Full retained-evidence audit verified 1,263/1,263 rules and 189/189 features,
+      with no failed features or missing links. See
+      docs/results/mysql-reconciled-v2-training-audit.json.
+      Expanded per-rule execution revalidation is still in progress.
 - [x] Run a 10,000-SQL full-grammar execution evaluation and preserve all errors.
       The repaired 1,263-rule snapshot executed 10,000/10,000 successfully on
       MySQL 8.4.11, with zero ANTLR errors. See
       docs/results/mysql-reconciled-v2-fuzz.json for hashes and evidence paths.
-      This sampled result does not replace the pending full rule audit.
+      This sampled result does not replace expanded per-rule execution revalidation.
 - [ ] Document deployment and push the verified project to the requested remote.
 
 Historical training output and hand-written smoke rules cannot substitute for
