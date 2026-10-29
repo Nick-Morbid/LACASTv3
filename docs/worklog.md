@@ -252,3 +252,11 @@ SQL execute after qualifying `power_args` references and explicitly casting
 bound operands to DECIMAL(65,0). Repair-003 in
 `runs/mysql-power-domain-repair-003` retains those context regressions and is
 currently running the full 90-query validation (seed 0). It is not accepted yet.
+
+POWER repair-003 (9ed59b7460579d5ea02c3f55) subsequently passed 90/90
+expanded target executions plus independent evidence audit. Eight explicit
+value regressions were rerun using this exact candidate's parsed production;
+all matched expected results (including zero/negative-exponent and overflow
+guards), and all repair-002 failed contexts execute successfully. It is pending
+import under `Mathematical Functions::POWER(X,Y)`, replacing
+da37350a06cbba0ed737b068. Only repair-003 is accepted among the POWER attempts.
