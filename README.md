@@ -79,6 +79,11 @@ passes. `--rule-limit` is diagnostic and cannot certify an untested remainder.
 A snapshot of an ongoing run does not certify subsequently accepted rules or
 the completion of the original training corpus.
 
+An interrupted revalidation can resume the same output directory with
+`--resume`. It keeps the original immutable rule snapshot even if the source
+training run has grown, preserves completed results, and archives any incomplete
+trial before retrying it. A per-directory lock prevents concurrent validators.
+
 After full training, expanded revalidation and the 10,000-query fuzz run finish,
 create a deployment directory with:
 

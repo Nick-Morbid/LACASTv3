@@ -70,6 +70,22 @@ def test_sqlcraft_annotations_are_rejected():
         parse_production('"SELECT" expression&_FROM')
 
 
+def test_duplicate_syntax_keeps_first_target_context_and_all_definitions(tmp_path):
+    rules = [Rule('target-double', 'double', '"ABS(" doubleAtom ")"'),
+             Rule('alias-int', 'integer', '"ABS(" integerAtom ")"')]
+    grammar = tmp_path / 'LearnedMySQL.g4'
+    mapping = compile_rules(ROOT / 'configs/mysql/MySQLBase.g4', rules, grammar)
+    source = grammar.read_text()
+    assert 'learnedPrimary: LP learnedRule0 RP;' in source
+    assert 'learnedRule1:' in source
+    syntax = SQLParser(grammar, ROOT / 'vendor/antlr-4.13.2-complete.jar', tmp_path / 'cache', mapping)
+    assert syntax.parse('SELECT (ABS(1));').rule_ids == {'target-double'}
+    # Reordering for a different candidate makes that candidate reachable first.
+    mapping = compile_rules(ROOT / 'configs/mysql/MySQLBase.g4', list(reversed(rules)), grammar)
+    syntax = SQLParser(grammar, ROOT / 'vendor/antlr-4.13.2-complete.jar', tmp_path / 'cache', mapping)
+    assert syntax.parse('SELECT (ABS(1));').rule_ids == {'alias-int'}
+
+
 def test_productions_cannot_smuggle_another_statement(tmp_path):
     with pytest.raises(ValueError, match='separator'):
         compile_rules(ROOT / 'configs/mysql/MySQLBase.g4',

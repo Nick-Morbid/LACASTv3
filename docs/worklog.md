@@ -99,3 +99,17 @@ audit also checks feature-to-rule contracts. A scan of 210 current accepted
 feature/rule links found no missing-feature violations. Unit tests total 47.
 The running trainer predates this last guard addition; the final audit enforces
 it regardless of which trainer revision accepted a rule.
+
+ANTLR profiling found the validator spending time in recursive prediction over
+identical overload syntax: 202 typed rules compiled to just 68 distinct syntax
+definitions. The compiler now keeps all named definitions but enters the first
+identical production only, preserving target-first alternative resolution.
+Against 34 retained real queries and 218 rules, rule-context results were
+identical and parse runtime changed from 30.81s to 1.51s. The earlier SLL/LL
+experiment was slower and was discarded. Evidence is in
+`runs/parser-dedup-benchmark-001/summary.json`.
+
+Revalidation now supports exclusive-lock `--resume`, retaining its immutable
+snapshot and completed results, recording runtime attempts, and archiving an
+incomplete trial. An interruption/resume regression verifies that later changes
+to the source run cannot change the resumed snapshot. Unit tests total 49.

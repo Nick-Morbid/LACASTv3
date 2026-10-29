@@ -24,6 +24,7 @@ def main():
     parser.add_argument('--fuzz-dir', type=Path)
     parser.add_argument('--count', type=int, default=10000)
     parser.add_argument('--rule-limit', type=int, default=0, help='Diagnostic revalidation limit; zero checks all rules')
+    parser.add_argument('--resume', action='store_true', help='Resume an interrupted revalidation snapshot')
     parser.add_argument('--seed', type=int, default=0)
     parser.add_argument('--generation-profile', choices=['baseline', 'expanded'], default='expanded')
     parser.add_argument('--allow-partial', action='store_true', help='Audit retained rules during an incomplete run')
@@ -44,7 +45,7 @@ def main():
     elif args.command == 'revalidate':
         if args.output is None:
             parser.error('revalidate requires --output (a new result directory)')
-        run_revalidation(args.work_dir, args.output, db, args.seed, args.rule_limit)
+        run_revalidation(args.work_dir, args.output, db, args.seed, args.rule_limit, args.resume)
     else:
         if args.output is None:
             parser.error('audit requires --output (a new result directory)')

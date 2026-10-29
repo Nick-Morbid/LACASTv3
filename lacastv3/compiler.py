@@ -50,10 +50,22 @@ def compile_rules(base: Path, rules: list[Rule], destination: Path):
 
     source = base.read_text(encoding='utf-8')
     if rules:
+        definitions = [emit(rule.tree) for rule in rules]
+        # Typed overloads often compile to identical syntax. Keep every named
+        # definition for provenance, but enter only the first identical one.
+        # Training puts the candidate first, so learnedRule0 remains reachable.
+        # This preserves first-alternative resolution without exploring dozens
+        # of indistinguishable recursive alternatives at every expression.
+        seen = set()
+        active_names = []
+        for name, definition in zip(rule_map, definitions):
+            if definition not in seen:
+                active_names.append(name)
+                seen.add(definition)
         source = source.replace('primary\n    : literal', 'primary\n    : learnedPrimary\n    | literal')
-        source += '\nlearnedPrimary: ' + ' | '.join(f"LP {name} RP" for name in rule_map) + ';\n'
-        for name, rule in zip(rule_map, rules):
-            source += f'{name}: {emit(rule.tree)};\n'
+        source += '\nlearnedPrimary: ' + ' | '.join(f"LP {name} RP" for name in active_names) + ';\n'
+        for name, definition in zip(rule_map, definitions):
+            source += f'{name}: {definition};\n'
         # Implicit ANTLR literals take lexical precedence over IDENTIFIER,
         # INTEGER and STRING. Preserve those tokens in generic SQL contexts too.
         base_keywords = set(re.findall(r"'([A-Z][A-Z_]*)'", base.read_text(encoding='utf-8')))
