@@ -35,13 +35,16 @@ def validate_feature(feature, rule):
             raise ValueError(f'Candidate removed the requested keyword {feature} from a derivation')
         return
     symbol = {'N % M': '%', 'expr LIKE pat [ESCAPE \'escape_char\']': 'LIKE',
-              'expr NOT LIKE pat [ESCAPE \'escape_char\']': 'NOT LIKE'}.get(feature, feature)
+              'expr NOT LIKE pat [ESCAPE \'escape_char\']': 'NOT LIKE',
+              'expr REGEXP pat': 'REGEXP',
+              'expr NOT REGEXP pat': 'NOT REGEXP'}.get(feature, feature)
     contracts = {'IS boolean_value': {'IS'}, 'IS NOT boolean_value': {'IS', 'NOT'},
                  'IS NULL': {'IS', 'NULL'}, 'IS NOT NULL': {'IS', 'NOT', 'NULL'},
-                 'NOT LIKE': {'NOT', 'LIKE'}}
+                 'NOT LIKE': {'NOT', 'LIKE'},
+                 'NOT REGEXP': {'NOT', 'REGEXP'}}
     required = contracts.get(symbol, {symbol})
     supported = {'-', '+', '/', '*', 'DIV', '%', '=', '|', '&', '^', '<<', '>>', '~',
-                 'BINARY', '<=>', '<>', '<=', '<', '>=', '>', 'NOT', 'AND', 'OR', 'XOR', 'LIKE'}
+                 'BINARY', '<=>', '<>', '<=', '<', '>=', '>', 'NOT', 'AND', 'OR', 'XOR', 'LIKE', 'REGEXP'}
     if symbol not in supported and symbol not in contracts:
         return
     if not required.issubset(tokens):

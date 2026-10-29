@@ -183,3 +183,10 @@ Compound CASE documentation signatures now require CASE/WHEN/THEN/END in
 every candidate derivation, rather than falling outside function/operator
 keyword checks. All eight already accepted CASE rules pass the new contract.
 The final independent audit enforces it; no trainer restart is needed. Tests: 61.
+
+The remaining regex operator signatures `expr REGEXP pat` and `expr NOT REGEXP pat`
+now require their operator tokens in every derivation. Regression tests reject
+replacement by REGEXP_LIKE, omission of NOT, and alternatives that omit REGEXP.
+The active trainer continues unchanged; final independent auditing uses these
+contracts before delivery. Tests: 66 passed. Training last confirmed at 167/189
+with no failed features; this is not a completion claim.
