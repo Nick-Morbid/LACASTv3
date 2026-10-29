@@ -1,0 +1,12 @@
+[
+  {
+    "key": "table1",
+    "fields": ["id", "active", "age", "is_active", "price", "created_at", "updated_at", "last_login", "duration", "year", "name", "description", "data"],
+    "types": ["integer", "bit", "integer", "boolean", "double", "date", "datetime", "timestamp", "time", "year", "char", "text", "blob"]
+  },
+  {
+    "key": "table2",
+    "fields": ["id", "status", "count", "active", "cost", "start_date", "timestamp", "event_time", "duration", "year", "label", "note", "image_data"],
+    "types": ["integer", "bit", "integer", "boolean", "double", "date", "datetime", "timestamp", "time", "year", "char", "text", "blob"]
+  }
+]

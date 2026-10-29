@@ -1,0 +1,47 @@
+# LACASTv3
+
+SQL grammar learning with ANTLR4 parsing, a schema-aware Python SQL generator,
+and execution feedback from the target database.
+
+## Refactor status
+
+Implementation is in progress. The MySQL corpus and schema are inherited from
+the SPARC-SQL space expander; no previously trained rules count as v3 training.
+
+ANTLR4 parses generated SQL. A separate generator owns type, scope, aggregation,
+and derivation metadata. Training measures only SQL whose derivation contains
+the exact candidate rule and whose ANTLR parse confirms that production. Empty
+or incomplete target samples never count as successful training.
+
+See `docs/architecture.md` for the implementation and acceptance requirements.
+
+## Development setup
+
+Requires Python 3.12+, `uv`, and Java 11+ for the ANTLR tool.
+
+```sh
+uv sync --extra test
+uv run python scripts/bootstrap.py
+uv run pytest -q
+```
+
+Copy `.env.example` to `.env` and configure an OpenAI-compatible LLM endpoint
+and a MySQL connection. The dedicated database is `lacastv3_mysql`. Initialize
+only that database with the smoke preflight, then start corpus-wide training:
+
+```sh
+uv run python scripts/preflight_mysql.py --initialize --output runs/preflight
+uv run python -m lacastv3 train --dbms mysql --work-dir runs/mysql
+```
+
+The smoke preflight creates the dedicated database and its two test tables.
+Do not run `--initialize` against a database whose test data you want to retain.
+The trainer resumes the same work directory and takes an exclusive file lock
+to prevent concurrent writers. `--feature-limit` is for diagnosis only; omit it
+for the complete 189-entry MySQL corpus. Training retains three batches of 30
+target-confirmed SQL statements per candidate and writes the SQL, derivation,
+execution errors and isolated-error attribution for audit.
+
+The current initial end-to-end preflight ran 100/100 SQL successfully against
+MySQL 8.4.11 with ONLY_FULL_GROUP_BY enabled. One real documentation-based AVG
+pilot completed with six accepted rules; this is not the full retraining result.

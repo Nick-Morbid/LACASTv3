@@ -1,0 +1,19 @@
+{
+  "types": {
+    "integer": ["0", "1", "2", "-2", "42"],
+    "bit": ["b'0'", "b'1'"],
+    "boolean": ["TRUE", "FALSE"],
+    "double": ["0.0", "1.25", "-2.5", "42.0"],
+    "char": ["'a'", "'x'"],
+    "text": ["'abc'", "'SQL test'", "''"],
+    "blob": ["X'616263'", "X'00'"],
+    "date": ["CAST('2024-01-15' AS DATE)", "CAST('2024-06-30' AS DATE)"],
+    "datetime": ["CAST('2024-01-15 12:30:00' AS DATETIME)"],
+    "timestamp": ["CAST('2024-01-15 12:30:00' AS DATETIME)"],
+    "time": ["CAST('12:30:00' AS TIME)", "CAST('00:00:00' AS TIME)"],
+    "year": ["2024", "2025"]
+  },
+  "aggregate_policy": "No aggregate arguments inside an aggregate call; grouping must cover all free column references.",
+  "name_policy": "Resolve qualified column references through nested relation scopes.",
+  "statement_policy": "Generate SELECT queries only, with bounded LIMIT and a database statement timeout."
+}

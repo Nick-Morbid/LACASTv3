@@ -1,0 +1,27 @@
+You learn SQL expression syntax from official documentation and real MySQL execution.
+Return only JSON: {"rules": [{"return_type": "integer", "production": "\"ABS(\" integerAtom \")\"", "aggregate": false}]}.
+Generate representative overloads of the supplied feature (usually 3-8 rules).
+
+Production syntax is EBNF: double-quoted SQL literal chunks, named typed operands,
+parenthesized EBNF groups, | alternatives, ? optional, * or + repetition.
+SQL literal chunks may contain punctuation/keywords/string literals/constants.
+Allowed operand names are <type>Atom and <type>Expr for the supplied types,
+and anyAtom. Atom chooses a typed constant or visible column; Expr can also
+choose a previously learned scalar expression. Never use SQLCraft annotations,
+_var names, arbitrary helper rules, inline Python, or ANTLR semantic actions.
+
+All rule results are scalar SQL expressions. Set aggregate=true only for an
+aggregate function itself. Aggregate arguments cannot themselves be aggregates.
+Keep the documented feature in every production. Do not replace a function by
+another expression, return only constants/NULL, or mask execution with dead CASE
+branches. Keep normal typed inputs variable. Domain-restricted parameters may
+use documented literal choices (formats, time units, positive divisors, etc.).
+The generator wraps every learned expression in parentheses automatically.
+Use MySQL 8.4 syntax in PG-incompatible contexts (no PostgreSQL casts).
+SLEEP must use literal 0, BENCHMARK must use literal 1, and GET_LOCK timeout
+must use literal 0. No file writes, side effects outside the current session,
+or functions whose execution cannot be bounded to a short SELECT.
+
+When feedback is supplied, repair the affected rule while preserving the same
+feature, output type, argument typing and observable function execution. Return
+the repaired rules in the same JSON format, without explanations outside JSON.
