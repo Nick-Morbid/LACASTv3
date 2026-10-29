@@ -296,3 +296,12 @@ records the original snapshot hash and each audited replacement import.
 Binary NOT LIKE has been imported; BIT_XOR and POWER imports are proceeding
 sequentially. The original runs/mysql source has not been modified. The revised
 copy will require its own full revalidation, audit and 10,000-query evaluation.
+
+The audit command now atomically publishes per-rule progress.json containing
+current rule, checked/verified/failed counts and final full_run_verified status.
+This improves observation of the forthcoming repaired-snapshot audit without
+changing acceptance criteria or treating a completed traversal as a passed
+audit. The complete test suite passed 67 tests. Existing audit processes keep
+their originally loaded implementation. Reconciliation remains live: BIT_XOR
+passed its first evidence replay and created an import checkpoint; copied
+trial replay is still running before authoritative candidate replacement.

@@ -69,7 +69,10 @@ def run_audit(source: Path, output: Path, allow_partial=False):
             candidates[verdict['rule']['id']].append(path.parent)
     checked = []
     failed = []
-    for rule in rules:
+    for index, rule in enumerate(rules):
+        save(output / 'progress.json', {'status': 'running', 'checked': index,
+             'requested': len(rules), 'verified': len(checked),
+             'failed': len(failed), 'current_rule_id': rule.id})
         failures = []
         for trial in candidates[rule.id]:
             try:
@@ -79,6 +82,9 @@ def run_audit(source: Path, output: Path, allow_partial=False):
                 failures.append(str(error))
         else:
             failed.append({'rule_id': rule.id, 'errors': failures or ['No successful retained trial']})
+        save(output / 'progress.json', {'status': 'running', 'checked': index + 1,
+             'requested': len(rules), 'verified': len(checked),
+             'failed': len(failed), 'current_rule_id': None})
     corpus = json.loads((ROOT / 'configs/mysql/web_corpus.json').read_text(encoding='utf-8'))
     expected = {feature_key(category, name) for category, entries in corpus.items() for name in entries}
     completed = set(state['completed_features'])
@@ -114,6 +120,9 @@ def run_audit(source: Path, output: Path, allow_partial=False):
               'rule_failures': failed, 'verified_rule_evidence': checked,
               'scope': 'Recomputed retained execution evidence and replayed exact ANTLR target contexts.'}
     save(output / 'audit.json', result)
+    save(output / 'progress.json', {'status': 'completed', 'checked': len(rules),
+         'requested': len(rules), 'verified': len(checked), 'failed': len(failed),
+         'full_run_verified': complete, 'current_rule_id': None})
     print(json.dumps({key: value for key, value in result.items() if key != 'verified_rule_evidence'}, indent=2))
     if failed or missing_links or feature_contract_failures or (not allow_partial and not complete):
         raise RuntimeError('Training evidence audit is incomplete or failed')
