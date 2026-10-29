@@ -54,3 +54,11 @@ Verification: 28 unit tests passed; expanded hand-written preflight passed
 `runs/mysql-expanded-learned-fuzz-001`: 100/100 MySQL executions passed, zero
 ANTLR errors. This diagnostic sample does not replace per-rule revalidation
 or the required final 10,000-query run.
+
+Expanded per-rule revalidation is now available through `revalidate`. A
+three-rule pilot (`runs/mysql-expanded-revalidation-pilot-001`) passed all
+270 target-confirmed executions and independent parser/evidence audits.
+The diagnostic limit leaves `full_snapshot_verified=false`. A full snapshot
+revalidation was subsequently launched in `runs/mysql-expanded-revalidation-001`
+while the original corpus trainer continues; neither writes the other's state.
+The snapshot does not include future trainer additions. Unit tests now total 29.

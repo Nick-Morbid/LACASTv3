@@ -58,3 +58,23 @@ batches. A complete audit also requires all 189 category/signature corpus entrie
 and a terminal completion record. `--allow-partial` can inspect an ongoing run
 without claiming completion. Duplicate signatures in different documentation
 categories have separate corpus identities.
+
+Training and fuzzing default to the `expanded` generation profile, including
+typed derived outputs, varied projections, joins, set operations and HAVING.
+Use `--generation-profile baseline` only to reproduce older generator evidence.
+Profiles are recorded in execution manifests and candidate verdicts. An existing
+Python training process keeps its originally loaded generator until restarted.
+
+To independently recheck a fixed snapshot of learned rules under expanded
+contexts without modifying the source run:
+
+```sh
+uv run python -m lacastv3 revalidate --work-dir runs/mysql --output runs/mysql-expanded-validation
+```
+
+This performs three batches of 30 target-confirmed executions per rule and
+independently audits retained parser/execution evidence. Failures are retained
+in `summary.json`; `full_snapshot_verified` is true only if every snapshot rule
+passes. `--rule-limit` is diagnostic and cannot certify an untested remainder.
+A snapshot of an ongoing run does not certify subsequently accepted rules or
+the completion of the original training corpus.
