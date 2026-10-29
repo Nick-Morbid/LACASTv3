@@ -138,3 +138,10 @@ presence and recompiles before replacing authoritative files. All feature links
 referencing a replaced rule are updated. No import has been performed against
 the running trainer. Tests include active-writer rejection and replacement/link
 checkpointing; 54 tests pass.
+
+Diagnostic expanded fuzz of the live learned-rule snapshot completed in
+`runs/mysql-expanded-diagnostic-fuzz1000-001`: 1,000/1,000 actual MySQL 8.4.11
+executions succeeded, zero ANTLR errors, 107.73 seconds. Every generated SQL
+was retained and executed, with no target filtering or failure resampling.
+This is an intermediate 1,000-query diagnostic, not the final 10,000-query
+evaluation and not evidence overturning the known overflow rejection.
