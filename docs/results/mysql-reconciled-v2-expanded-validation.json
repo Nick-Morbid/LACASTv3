@@ -1,0 +1,18 @@
+{
+  "status": "completed",
+  "checked": 1263,
+  "requested": 1263,
+  "snapshot_rules": 1263,
+  "passed": 1260,
+  "full_snapshot_verified": false,
+  "generation_profile": "expanded",
+  "failed_rule_ids": [
+    "04816fa1ec13dc57c01469c5",
+    "0477f5451960cbbf5b1dddd3",
+    "d54adabf3f243d65acf2bdb8"
+  ],
+  "rules_sha256": "acf9dacfa15b490c36f01ab17f57e73220a84b453a5e3071b4e2008fcd32f373",
+  "summary_sha256": "b64434b9ad96bae0fd6d2153a1587e3f7e3a7f7e4fb92387adae25c8967dec4c",
+  "evidence_directory": "runs\\mysql-reconciled-v2-expanded-validation",
+  "scope": "Terminal v2 diagnostic; three failures replaced in v3, whose full validation remains in progress."
+}

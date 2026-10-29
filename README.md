@@ -49,14 +49,18 @@ features. The repaired candidate snapshot contains 1,263 learned rules in
 `runs/mysql-reconciled-v2`; three replacements have independently retained
 acceptance evidence. The original training directory is preserved separately.
 
-The repaired snapshot executed 10,000/10,000 generated SQL successfully against
-MySQL 8.4.11, with zero ANTLR errors. Hashes and retained-evidence locations are
-recorded in `docs/results/mysql-reconciled-v2-fuzz.json`. Full training-evidence
-audit verified all 1,263 rules and 189 features; see
-`docs/results/mysql-reconciled-v2-training-audit.json`. Expanded per-rule
-execution revalidation remains in progress. These
-results do not yet certify a final deployment bundle; the export gates below
-still require complete expanded revalidation and retained-evidence replay.
+The v2 snapshot's expanded revalidation finished with 1,260/1,263 rules passing.
+The three failures were REGEXP argument-domain/charset errors. Their independently
+verified replacements were imported into `runs/mysql-reconciled-v3`, preserving
+1,263 rules and the original evidence. See
+`docs/results/mysql-reconciled-v3-repairs.json` for exact replacements and domains.
+
+The v3 snapshot executed 10,000/10,000 generated SQL successfully on MySQL 8.4.11,
+with zero ANTLR errors; all retained records and snapshot hashes were checked.
+See `docs/results/mysql-reconciled-v3-fuzz.json`. Full v3 training-evidence audit
+and expanded per-rule execution revalidation remain in progress. The earlier
+v2 training audit passed all retained samples, but does not replace v3 validation.
+A final deployment bundle still requires all export gates below.
 
 The fuzz command executes every generated query, retains all database failures,
 and reports ANTLR parsing errors separately. Its output directory must be new.
