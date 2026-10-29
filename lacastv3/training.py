@@ -20,6 +20,7 @@ from .profiles import generator_class
 from .parser import SQLParser
 from .productions import Rule
 from .features import feature_key, feature_directory, normalize_events, upgrade_state, migrate_feature_directories
+from .feature_contract import validate_feature
 
 ROOT = Path(__file__).resolve().parents[1]
 
@@ -116,17 +117,7 @@ class Trainer:
             identity = hashlib.sha256(json.dumps([dtype, production, aggregate]).encode()).hexdigest()[:24]
             rule = Rule(identity, dtype, production, aggregate)
             rule.tree
-            function = re.match(r'\s*([A-Za-z_][A-Za-z_0-9]*)\s*\(', feature)
-            if function:
-                words = set()
-                def collect(node):
-                    if node.kind == 'literal':
-                        words.update(token.upper() for token in SQL_TOKENS.findall(node.value))
-                    for child in node.children:
-                        collect(child)
-                collect(rule.tree)
-                if function[1].upper() not in words:
-                    raise ValueError(f'Candidate removed the requested function {function[1]}')
+            validate_feature(feature, rule)
             if rule not in result:
                 result.append(rule)
         if not result:

@@ -84,3 +84,18 @@ reuse failed candidates or bypass later expanded revalidation. A regression
 test exercises a mixed pass/fail response followed by a repair; 38 tests pass.
 This change is pending application to the running trainer at its next justified
 engine upgrade; its current process still uses the archived baseline code.
+
+Controlled runtime upgrade at 2026-10-29T13:24:54Z: archived state/rules/events
+under `runs/mysql/checkpoints/20261029T132454Z`, retained 205 accepted rules and
+25 completed features, then resumed using expanded generation. The exclusive
+trainer process pair was rechecked; the independent 202-rule snapshot validator
+was untouched. The first expanded candidate passed all 90 executions. Runtime
+since the last checkpoint for the interrupted feature is explicitly uncounted,
+not silently represented as measured elapsed training time.
+
+Candidate feature contracts now require the function/operator token in every
+derivation, including alternatives and optional EBNF branches. The independent
+audit also checks feature-to-rule contracts. A scan of 210 current accepted
+feature/rule links found no missing-feature violations. Unit tests total 47.
+The running trainer predates this last guard addition; the final audit enforces
+it regardless of which trainer revision accepted a rule.

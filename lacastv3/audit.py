@@ -8,6 +8,7 @@ from .parser import SQLParser
 from .compiler import compile_rules
 from .productions import Rule
 from .features import feature_key, normalize_events, upgrade_state
+from .feature_contract import validate_feature
 from .training import ROOT, save
 
 
@@ -82,11 +83,19 @@ def run_audit(source: Path, output: Path, allow_partial=False):
     expected = {feature_key(category, name) for category, entries in corpus.items() for name in entries}
     completed = set(state['completed_features'])
     feature_links = {}
+    feature_contract_failures = []
+    rules_by_id = {rule.id: rule for rule in rules}
     legacy_keys = {event['feature']: event['feature_key'] for event in events if event['event'] == 'feature_started'}
     for path in (source / 'features').glob('*/accepted.json'):
         data = json.loads(path.read_text())
         key = data.get('feature_key') or legacy_keys[data['feature']]
         feature_links[key] = set(data['rule_ids'])
+        for rule_id in data['rule_ids']:
+            if rule_id in rules_by_id:
+                try:
+                    validate_feature(data['feature'], rules_by_id[rule_id])
+                except ValueError as error:
+                    feature_contract_failures.append({'feature_key': key, 'rule_id': rule_id, 'error': str(error)})
     accepted_ids = {item.id for item in rules}
     missing_links = sorted(feature for feature in completed
                            if not feature_links.get(feature) or not feature_links[feature].issubset(accepted_ids))
@@ -94,16 +103,18 @@ def run_audit(source: Path, output: Path, allow_partial=False):
     natural_completion = bool(terminal and terminal[-1]['event'] == 'training_stopped'
                               and terminal[-1].get('status') == 'completed')
     complete = (completed == expected and not state['failed_features']
-                and not failed and not missing_links and state['status'] == 'completed' and natural_completion)
+                and not failed and not missing_links and not feature_contract_failures
+                and state['status'] == 'completed' and natural_completion)
     result = {'source': str(source.resolve()), 'full_run_verified': complete,
               'rules_checked': len(rules), 'rules_verified': len(checked),
               'corpus_items': len(expected), 'completed_features': len(completed),
               'failed_features': state['failed_features'], 'missing_feature_links': missing_links,
+              'feature_contract_failures': feature_contract_failures,
               'terminal_completion_recorded': natural_completion,
               'rule_failures': failed, 'verified_rule_evidence': checked,
               'scope': 'Recomputed retained execution evidence and replayed exact ANTLR target contexts.'}
     save(output / 'audit.json', result)
     print(json.dumps({key: value for key, value in result.items() if key != 'verified_rule_evidence'}, indent=2))
-    if failed or missing_links or (not allow_partial and not complete):
+    if failed or missing_links or feature_contract_failures or (not allow_partial and not complete):
         raise RuntimeError('Training evidence audit is incomplete or failed')
     return result
