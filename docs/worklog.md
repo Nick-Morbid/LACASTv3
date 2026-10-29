@@ -178,3 +178,8 @@ target-confirmed executions plus independent audits (180/180 in total). Use
 these expanded `trial-<rule_id>` directories for the pending post-writer
 imports, rather than the earlier baseline recovery evidence. Nothing was
 imported into the active trainer.
+
+Compound CASE documentation signatures now require CASE/WHEN/THEN/END in
+every candidate derivation, rather than falling outside function/operator
+keyword checks. All eight already accepted CASE rules pass the new contract.
+The final independent audit enforces it; no trainer restart is needed. Tests: 61.

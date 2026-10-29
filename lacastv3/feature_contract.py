@@ -19,6 +19,10 @@ def guaranteed_tokens(node):
 
 def validate_feature(feature, rule):
     tokens = guaranteed_tokens(rule.tree)
+    if feature.startswith('CASE '):
+        if not {'CASE', 'WHEN', 'THEN', 'END'}.issubset(tokens):
+            raise ValueError('Candidate removed the requested CASE expression from a derivation')
+        return
     function = re.match(r'\s*([A-Za-z_][A-Za-z_0-9]*)\s*\(', feature)
     if function:
         if function[1].upper() not in tokens:
