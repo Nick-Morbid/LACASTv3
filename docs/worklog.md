@@ -170,3 +170,11 @@ runtime ROOT is the copied directory, downloaded and checksum-verified ANTLR,
 and executed 20/20 generated SQL on MySQL with zero parser errors. It used an
 explicit external connection config without copying it. This is a deployment
 asset smoke only; the final evidence-gated export has not yet been produced.
+
+The two pending BIT_AND recoveries were rechecked under expanded generation
+against a newer learned-rule snapshot in `runs/mysql-expanded-bitand-recovery-001`.
+Both `253317da1f5f2713937d4d14` and `c31ef89ffe36eb0338a28b36` passed 90/90
+target-confirmed executions plus independent audits (180/180 in total). Use
+these expanded `trial-<rule_id>` directories for the pending post-writer
+imports, rather than the earlier baseline recovery evidence. Nothing was
+imported into the active trainer.
