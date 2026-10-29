@@ -25,13 +25,13 @@
 
 ## Work remaining / completion gates
 
-- [ ] Clean base syntax compiled by ANTLR4, with lexer/parser error rejection.
-- [ ] Typed production compiler and exact target-alternative identification.
+- [x] Clean base syntax compiled by ANTLR4, with lexer/parser error rejection.
+- [x] Typed production compiler and exact target-alternative identification.
 - [ ] Schema-aware generator with CTE/join/subquery/group/set-operation scopes.
 - [ ] Integrate LLM generation, refinement, persistence, metrics, and CLI.
-- [ ] Reject SQLCraft annotations in new grammar and prompts; no SQLCraft JAR
+- [x] Reject SQLCraft annotations in new grammar and prompts; no SQLCraft JAR
       or socket server required by the runtime.
-- [ ] Dedicated MySQL database initialized and its actual version recorded.
+- [x] Dedicated MySQL database initialized and its actual version recorded (8.4.11).
 - [ ] Retrain every entry of the 189-item MySQL corpus; audit full rule samples.
 - [ ] Run a 10,000-SQL full-grammar execution evaluation and preserve all errors.
 - [ ] Document deployment and push the verified project to the requested remote.

@@ -32,6 +32,7 @@ only that database with the smoke preflight, then start corpus-wide training:
 ```sh
 uv run python scripts/preflight_mysql.py --initialize --output runs/preflight
 uv run python -m lacastv3 train --dbms mysql --work-dir runs/mysql
+uv run python -m lacastv3 fuzz --dbms mysql --work-dir runs/mysql --output runs/mysql-fuzz10000 --count 10000
 ```
 
 The smoke preflight creates the dedicated database and its two test tables.
@@ -45,3 +46,7 @@ execution errors and isolated-error attribution for audit.
 The current initial end-to-end preflight ran 100/100 SQL successfully against
 MySQL 8.4.11 with ONLY_FULL_GROUP_BY enabled. One real documentation-based AVG
 pilot completed with six accepted rules; this is not the full retraining result.
+
+The fuzz command executes every generated query, retains all database failures,
+and reports ANTLR parsing errors separately. Its output directory must be new.
+The execution-success rate does not verify the returned SQL result values.

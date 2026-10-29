@@ -63,3 +63,10 @@ def test_fixed_literals_do_not_break_generic_tokens(parser):
 def test_sqlcraft_annotations_are_rejected():
     with pytest.raises(ValueError):
         parse_production('"SELECT" expression&_FROM')
+
+
+def test_productions_cannot_smuggle_another_statement(tmp_path):
+    with pytest.raises(ValueError, match='separator'):
+        compile_rules(ROOT / 'configs/mysql/MySQLBase.g4',
+                      [Rule('invalid', 'integer', '"1; DELETE FROM table1"')],
+                      tmp_path / 'Unsafe.g4')
