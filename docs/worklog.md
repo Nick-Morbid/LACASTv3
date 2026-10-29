@@ -232,3 +232,15 @@ and `runs/mysql-bitxor-numeric-repair-001/trial`, replacing 61e731e3ab9c28bb597b
 under `Aggregate Function Descriptions::BIT_XOR(expr) [over_clause]`.
 Keep original failed snapshot evidence; revised results need new full revalidation,
 training evidence audit, and 10,000-query evaluation before export.
+
+Original fuzz query 3430 exposed POWER(0,-2), errno 1690, in integer-operand
+POWER rule da37350a06cbba0ed737b068. Candidate 1376c45be39190992249257e
+(`runs/mysql-power-domain-repair-001`) guards a zero base with NULLIF but failed
+expanded execution on table2.count raised to itself; do not import it.
+`runs/mysql-power-domain-repair-002` binds the two original operands once in
+a correlated scalar subquery, guards zero-negative powers and log magnitude
+outside [-700,700], and preserves variable exponents. Exact database value
+checks passed for zero, positive/negative bases, and negative exponents; invalid
+and overflow cases return NULL. Its 90-query expanded trial is running.
+No POWER replacement has been accepted or imported yet. Original fuzz failures
+at indices 404 and 3430 remain included in the execution denominator.
