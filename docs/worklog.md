@@ -322,3 +322,21 @@ expanded validation passed its first two rules, and fuzz passed its first 100
 executions. These are new snapshot experiments; old counts are not carried
 over. See runs/mysql-reconciled-v2/validation-jobs.json and each adjacent .log
 for actual handles/output. All final gates and deployment export remain pending.
+
+Repaired-snapshot training audit exposed five false definition mismatches in
+historical equality rules: retained EBNF contained duplicate identical sequence
+alternatives, while the current compiler deduplicated them. Diagnostic replay
+confirmed the error before SQL parsing. normalized_definition now canonicalizes
+generated EBNF structure, removing redundant groups and duplicate alternatives
+while preserving literal tokens, branch order and repeat quantifiers. Tests
+reject changed operators and distinguish optional from mandatory productions;
+68 tests passed. All six equality definitions at indices 190-195 compare
+equivalent. Recompiling the complete repaired snapshot yields exactly the same
+grammar hash as the ongoing fuzz experiment, so generated syntax is unchanged.
+
+The affected audit reader (verified PID 17168) was deliberately stopped for
+this confirmed validator defect, its progress marked interrupted with reason,
+and its evidence retained. A fresh full audit is running in
+runs/mysql-reconciled-v2-training-audit-r2 (exec session 14167). Other snapshot
+validation and fuzz processes continue unchanged. Do not use the interrupted
+audit as acceptance evidence; the new audit must finish successfully.

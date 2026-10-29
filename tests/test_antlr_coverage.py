@@ -91,8 +91,20 @@ def test_definition_normalization_only_removes_redundant_operand_choices():
     new = "learnedRule0: expression '+' expression;"
     assert normalized_definition(old) == normalized_definition(new)
     literal = 'learnedRule0: ' + terminal("'(expression | expression)'") + ';'
-    assert normalized_definition(literal) == literal
+    assert normalized_definition(literal) != normalized_definition(
+        literal.replace('(expression | expression)', 'expression'))
     assert normalized_definition(old) != normalized_definition(new.replace("'+'", "'-'"))
+
+
+def test_normalization_collapses_duplicate_sequences_but_preserves_alternatives():
+    simple = "learnedRule0: expression '=' expression;"
+    duplicated = "learnedRule0: (expression '=' expression | expression '=' expression);"
+    assert normalized_definition(simple) == normalized_definition(duplicated)
+    assert normalized_definition(simple) != normalized_definition(duplicated.replace("'='", "'<>'", 1))
+    optional = "learnedRule0: (expression '=' expression)?;"
+    assert normalized_definition(simple) != normalized_definition(optional)
+    assert normalized_definition(optional) == normalized_definition(
+        "learnedRule0: ((expression '=' expression | expression '=' expression))?;")
 
 
 def test_factored_boundaries_preserve_nested_contexts_and_rejection(tmp_path):

@@ -22,12 +22,40 @@ def terminal(text):
 
 
 def normalized_definition(definition):
-    """Remove redundant typed-operand choices without touching SQL literals."""
-    chunks = re.split(r"('(?:\\.|[^'\\])*')", definition)
-    for index in range(0, len(chunks), 2):
-        chunks[index] = re.sub(r'\(\s*expression(?:\s*\|\s*expression)*\s*\)',
-                               'expression', chunks[index])
-    return ''.join(chunks)
+    """Canonicalize generated EBNF groups and duplicate choices, keeping literals opaque."""
+    tokens = re.findall(r"'(?:\\.|[^'\\])*'|[A-Za-z_][A-Za-z_0-9]*|[^\s]", definition)
+    position = 0
+
+    def choice():
+        nonlocal position
+        alternatives = []
+        sequence = []
+        while position < len(tokens) and tokens[position] != ')':
+            token = tokens[position]
+            position += 1
+            if token == '|':
+                alternatives.append(tuple(sequence))
+                sequence = []
+                continue
+            if token == '(':
+                node = choice()
+                if position >= len(tokens) or tokens[position] != ')':
+                    raise ValueError('Unbalanced generated grammar definition')
+                position += 1
+            else:
+                node = (token,)
+            if position < len(tokens) and tokens[position] in ('?', '*', '+'):
+                node = (('repeat', node, tokens[position]),)
+                position += 1
+            sequence.extend(node)
+        alternatives.append(tuple(sequence))
+        alternatives = list(dict.fromkeys(alternatives))
+        return alternatives[0] if len(alternatives) == 1 else (('choice', tuple(alternatives)),)
+
+    result = choice()
+    if position != len(tokens):
+        raise ValueError('Unbalanced generated grammar definition')
+    return result
 
 
 def compile_rules(base: Path, rules: list[Rule], destination: Path):
