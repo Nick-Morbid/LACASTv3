@@ -282,3 +282,17 @@ on this specific retained trial, not a universal performance guarantee).
 Raw timings and context sets are retained locally in
 runs/parser-parenthesis-factor-benchmark-001/all-comparison.jsonl. Existing
 long-running jobs remain on their original loaded runtime and are still live.
+
+The original 1,263-rule expanded fuzz experiment completed naturally with
+10,000 retained executions: 9,998 database successes, 2 failures, zero ANTLR
+errors, elapsed 2,556.238 seconds. All 10,000 records were independently read
+back; the only failures were indices 404 (binary NOT LIKE encoding) and 3430
+(POWER zero-negative exponent). This 99.98% result belongs to the unrepaired
+snapshot and is not the final deployment result.
+
+To preserve the original live training audit, a separate complete evidence
+copy is being reconciled at runs/mysql-reconciled-v2. Its reconciliation.json
+records the original snapshot hash and each audited replacement import.
+Binary NOT LIKE has been imported; BIT_XOR and POWER imports are proceeding
+sequentially. The original runs/mysql source has not been modified. The revised
+copy will require its own full revalidation, audit and 10,000-query evaluation.
