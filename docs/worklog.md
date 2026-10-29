@@ -373,3 +373,7 @@ final metadata gate; it was deliberately stopped with an explicit interrupted
 reason, preserving progress. Replacement full audit runs at
 runs/mysql-reconciled-v2-training-audit-r3 (exec session 58397). Existing
 expanded rule validation continues; completed 10,000-query evidence is unchanged.
+
+### 2026-10-30 Windows checkpoint replacement recovery
+Expanded revalidation exited after rule 903 passed because Windows denied atomic progress.json replacement (WinError 5). The persisted checkpoint retained 902 verified results; the interrupted summary retained 903. Added bounded PermissionError retries around atomic replacement, preserving the old checkpoint on persistent denial. Two regression tests exercise transient and permanent denial; full suite: 75 passed. Resumed the same immutable snapshot from its persisted checkpoint, archiving the uncheckpointed trial through the existing resume path. Resumed process pair: 21232/44480; subsequently passed rule 905. Training evidence audit remains running with 1218 verified and zero failures. This is a persistence recovery, with no rule, generator, grammar or acceptance-threshold change.
+

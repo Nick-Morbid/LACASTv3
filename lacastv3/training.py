@@ -28,7 +28,16 @@ ROOT = Path(__file__).resolve().parents[1]
 def save(path, data):
     temporary = path.with_suffix(path.suffix + '.tmp')
     temporary.write_text(json.dumps(data, ensure_ascii=False, indent=2), encoding='utf-8')
-    temporary.replace(path)
+    # Windows readers/antivirus may briefly deny replacement of an open file.
+    # Keep the old checkpoint intact and retry the atomic operation only.
+    for attempt in range(10):
+        try:
+            temporary.replace(path)
+            break
+        except PermissionError:
+            if attempt == 9:
+                raise
+            time.sleep(0.05 * (attempt + 1))
 
 
 @contextmanager
