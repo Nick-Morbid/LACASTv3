@@ -57,9 +57,10 @@ verified replacements were imported into `runs/mysql-reconciled-v3`, preserving
 
 The v3 snapshot executed 10,000/10,000 generated SQL successfully on MySQL 8.4.11,
 with zero ANTLR errors; all retained records and snapshot hashes were checked.
-See `docs/results/mysql-reconciled-v3-fuzz.json`. Full v3 training-evidence audit
-and expanded per-rule execution revalidation remain in progress. The earlier
-v2 training audit passed all retained samples, but does not replace v3 validation.
+See `docs/results/mysql-reconciled-v3-fuzz.json`. The full v3 training-evidence audit verified
+1,263/1,263 rules and 189/189 features, with no failures or missing links; see
+`docs/results/mysql-reconciled-v3-training-audit.json`. Expanded per-rule
+execution revalidation remains in progress.
 A final deployment bundle still requires all export gates below.
 
 The fuzz command executes every generated query, retains all database failures,

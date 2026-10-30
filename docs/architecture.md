@@ -39,7 +39,7 @@
 - [x] Retrain every entry of the 189-item MySQL corpus; audit full rule samples.
       Full retained-evidence audit verified 1,263/1,263 rules and 189/189 features,
       with no failed features or missing links. See
-      docs/results/mysql-reconciled-v2-training-audit.json.
+      docs/results/mysql-reconciled-v3-training-audit.json.
       Expanded per-rule execution revalidation is still in progress.
 - [x] Run a 10,000-SQL full-grammar execution evaluation and preserve all errors.
       The repaired 1,263-rule snapshot executed 10,000/10,000 successfully on

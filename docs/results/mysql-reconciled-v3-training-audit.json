@@ -1,0 +1,16 @@
+{
+  "full_run_verified": true,
+  "rules_checked": 1263,
+  "rules_verified": 1263,
+  "corpus_items": 189,
+  "completed_features": 189,
+  "failed_features": [],
+  "missing_feature_links": [],
+  "feature_contract_failures": [],
+  "terminal_completion_recorded": true,
+  "rule_failures": [],
+  "scope": "Recomputed retained execution evidence and replayed exact ANTLR target contexts.",
+  "audit_sha256": "0f23cdbcc5e1bc9b9390aac762cb151336213d9a420414d9db366ac3b041489d",
+  "rules_sha256": "f77b634c17e722cd73c99e7d8377d100eb101ec470253cade06d98e8a9bc9aff",
+  "evidence_directory": "runs/mysql-reconciled-v3-training-audit"
+}
