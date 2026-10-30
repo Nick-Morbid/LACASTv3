@@ -72,8 +72,8 @@ The current v5 snapshot preserves 1,263 rules. It executed 10,000/10,000 SQL
 successfully on MySQL 8.4.11 with zero ANTLR errors; all retained records,
 continuous indices and snapshot hashes were independently checked. See
 `docs/results/mysql-reconciled-v5-fuzz.json`. Full expanded per-rule validation
-is still running. The 10,000-query result does not establish that every learned
-rule passes its individual acceptance gate.
+also completed: all 1,263 unique rules passed their individual acceptance gates
+and retained-evidence audits. See `docs/results/mysql-reconciled-v5-validation.json`.
 A final deployment bundle still requires all export gates below.
 
 The fuzz command executes every generated query, retains all database failures,

@@ -1,0 +1,14 @@
+{
+  "status": "completed",
+  "checked": 1263,
+  "requested": 1263,
+  "snapshot_rules": 1263,
+  "passed": 1263,
+  "full_snapshot_verified": true,
+  "generation_profile": "expanded",
+  "rules_sha256": "44292632fa4f01a0f3aa4ad97dd697452aa92a93bf11d66f0554d6888333f253",
+  "server_version": "8.4.11",
+  "unique_rule_ids_verified": 1263,
+  "evidence_directory": "runs\\mysql-reconciled-v5-expanded-validation",
+  "summary_sha256": "15baae8709117037530813c3339e1dc66b943b2446f3ace4f5e1ef22fbe5b34c"
+}
