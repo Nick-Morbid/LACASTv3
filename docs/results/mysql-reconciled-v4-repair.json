@@ -1,0 +1,44 @@
+{
+  "scope": "Independently accepted and audited RLIKE repair imported into v4; full v4 validation and fuzzing pending.",
+  "rules": 1263,
+  "rules_sha256": "1dc3308a8655ab51747db386ab0fc294fd7342bb7672e081e38508da1e7ca9e9",
+  "repair": {
+    "replaces": "1d8fcdc04c581d40ed1ac17d",
+    "rule": {
+      "id": "d63055d99d8c56903c44f0e2",
+      "return_type": "integer",
+      "production": "charExpr \" RLIKE NULLIF(\" charExpr \", '')\"",
+      "aggregate": false
+    },
+    "domain": "Empty regex patterns become SQL NULL; nonempty patterns are unchanged.",
+    "source_sha256": "f77b634c17e722cd73c99e7d8377d100eb101ec470253cade06d98e8a9bc9aff"
+  },
+  "batches": [
+    {
+      "target_sql": 30,
+      "generated": 30,
+      "discarded": 0,
+      "accuracy": 1.0,
+      "target_errors": 0,
+      "errors": []
+    },
+    {
+      "target_sql": 30,
+      "generated": 30,
+      "discarded": 0,
+      "accuracy": 1.0,
+      "target_errors": 0,
+      "errors": []
+    },
+    {
+      "target_sql": 30,
+      "generated": 30,
+      "discarded": 0,
+      "accuracy": 1.0,
+      "target_errors": 0,
+      "errors": []
+    }
+  ],
+  "trial_directory": "runs\\mysql-rlike-empty-pattern-repair-001\\trial",
+  "audit_sha256": "a516e63390530db4c6ea03f188230f3ba7627f7e5e9bda33cbbbf78fc2bb9bad"
+}

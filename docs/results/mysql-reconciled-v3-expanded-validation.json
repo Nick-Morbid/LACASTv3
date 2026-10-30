@@ -1,0 +1,18 @@
+{
+  "status": "completed",
+  "checked": 1263,
+  "requested": 1263,
+  "snapshot_rules": 1263,
+  "passed": 1262,
+  "full_snapshot_verified": false,
+  "generation_profile": "expanded",
+  "scope": "Completed diagnostic validation of v3; RLIKE empty-pattern failure prevents delivery.",
+  "evidence_directory": "runs\\mysql-reconciled-v3-expanded-validation",
+  "summary_sha256": "32ceb4f74ce6d8749ce035ad02554487a5b3c8b9272cb4f00e31f15742391b76",
+  "failures": [
+    {
+      "rule_id": "1d8fcdc04c581d40ed1ac17d",
+      "passed": false
+    }
+  ]
+}
