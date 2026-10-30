@@ -1,0 +1,44 @@
+{
+  "scope": "Independently accepted and audited date REGEXP repair imported into v5; full v5 validation and fuzzing pending.",
+  "rules": 1263,
+  "rules_sha256": "44292632fa4f01a0f3aa4ad97dd697452aa92a93bf11d66f0554d6888333f253",
+  "repair": {
+    "replaces": "43526347de052c9373f2aec5",
+    "rule": {
+      "id": "adce04f95e4df84fcfc4d93d",
+      "return_type": "integer",
+      "production": "dateExpr \" REGEXP NULLIF(\" charExpr \", '')\"",
+      "aggregate": false
+    },
+    "domain": "Empty regex patterns become SQL NULL; nonempty patterns are unchanged.",
+    "source_sha256": "1dc3308a8655ab51747db386ab0fc294fd7342bb7672e081e38508da1e7ca9e9"
+  },
+  "batches": [
+    {
+      "target_sql": 30,
+      "generated": 30,
+      "discarded": 0,
+      "accuracy": 1.0,
+      "target_errors": 0,
+      "errors": []
+    },
+    {
+      "target_sql": 30,
+      "generated": 30,
+      "discarded": 0,
+      "accuracy": 1.0,
+      "target_errors": 0,
+      "errors": []
+    },
+    {
+      "target_sql": 30,
+      "generated": 30,
+      "discarded": 0,
+      "accuracy": 1.0,
+      "target_errors": 0,
+      "errors": []
+    }
+  ],
+  "trial_directory": "runs\\mysql-date-regexp-empty-pattern-repair-001\\trial",
+  "audit_sha256": "0d9b79de2b6ee0295c747d5c5b0656080365bec079e1af49afe0d0e43514e0c6"
+}

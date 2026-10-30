@@ -60,7 +60,20 @@ with zero ANTLR errors; all retained records and snapshot hashes were checked.
 See `docs/results/mysql-reconciled-v3-fuzz.json`. The full v3 training-evidence audit verified
 1,263/1,263 rules and 189/189 features, with no failures or missing links; see
 `docs/results/mysql-reconciled-v3-training-audit.json`. Expanded per-rule
-execution revalidation remains in progress.
+execution revalidation subsequently exposed an empty-pattern RLIKE failure.
+Its independently audited replacement was imported into v4. The full v4
+revalidation passed 1,262/1,263 rules; its remaining date REGEXP rule failed on
+an empty pattern. The accepted replacement uses `NULLIF(pattern, '')`, so
+an empty pattern yields SQL NULL; nonempty patterns are unchanged. Its three
+30-query batches each achieved 100% execution success with zero target errors.
+See `docs/results/mysql-reconciled-v5-repair.json`.
+
+The current v5 snapshot preserves 1,263 rules. It executed 10,000/10,000 SQL
+successfully on MySQL 8.4.11 with zero ANTLR errors; all retained records,
+continuous indices and snapshot hashes were independently checked. See
+`docs/results/mysql-reconciled-v5-fuzz.json`. Full expanded per-rule validation
+is still running. The 10,000-query result does not establish that every learned
+rule passes its individual acceptance gate.
 A final deployment bundle still requires all export gates below.
 
 The fuzz command executes every generated query, retains all database failures,

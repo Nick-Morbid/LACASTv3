@@ -1,0 +1,18 @@
+{
+  "status": "completed",
+  "requested": 10000,
+  "executed": 10000,
+  "passed": 10000,
+  "errors": 0,
+  "accuracy": 1.0,
+  "antlr_errors": 0,
+  "elapsed_seconds": 645.1262185000814,
+  "definition": "Database execution success; all generated SQL retained, no target filtering.",
+  "rules_sha256": "44292632fa4f01a0f3aa4ad97dd697452aa92a93bf11d66f0554d6888333f253",
+  "grammar_sha256": "96cdf481b13eb54d45bbe60fb7ef4a1dad79c9833eb0a34f1f578dc0d7e9a2a5",
+  "evidence_directory": "runs\\mysql-reconciled-v5-fuzz10000",
+  "retained_records_verified": 10000,
+  "indices_verified": true,
+  "records_sha256": "1601e894b1d0ef48ce0fddb94d93059bd653facfd01ab6a1ab4cf9c5ff3a2993",
+  "server_version": "8.4.11"
+}
