@@ -18,7 +18,7 @@ version and file hashes. No database password or LLM key is distributed.
    connection with the expanded preflight:
 
    ```sh
-   uv run python scripts/preflight_mysql.py --initialize --expanded --output runs/deployment-preflight
+   uv run python -c "from dotenv import load_dotenv; load_dotenv(); import runpy; runpy.run_path('scripts/preflight_mysql.py', run_name='__main__')" --initialize --expanded --output runs/deployment-preflight
    ```
 
    Initialization replaces the dedicated test tables. Omit `--initialize` if
@@ -36,3 +36,9 @@ its outcome. Database failures remain in the denominator. The execution rate
 does not compare returned values with a semantic correctness oracle. Testing
 against a different server version produces a new result, not the original
 delivery's verified accuracy.
+
+The preflight command above explicitly loads `.env`; the main CLI loads it
+automatically. Alternatively, supply `--db-config /path/to/private.yaml` to
+use an existing private `db_config` configuration. Keep credentials outside
+the exported bundle. The published v5 learned assets in this repository use
+`--work-dir artifacts/mysql-v5`; a standalone exported directory uses `--work-dir .`.

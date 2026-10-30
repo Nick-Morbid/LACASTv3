@@ -48,8 +48,10 @@
       MySQL 8.4.11, with zero ANTLR errors. See
       docs/results/mysql-reconciled-v5-fuzz.json for hashes and evidence paths.
       This sampled result does not replace expanded per-rule execution revalidation.
-- [ ] Document deployment and push the verified project to the requested remote.
+- [x] Document deployment and push the verified project to the requested remote.
+      Gated v5 export verified all retained training and expanded trials.
+      An independent directory/venv passed 165 infrastructure and 300 learned-grammar
+      SQL executions on MySQL 8.4.11; see docs/results/mysql-v5-delivery.json.
 
 Historical training output and hand-written smoke rules cannot substitute for
-the new corpus-wide training run. This checklist is intentionally incomplete
-until runtime evidence proves each gate.
+the new corpus-wide training run. The completion gates above are backed by retained runtime evidence.

@@ -5,8 +5,11 @@ and execution feedback from the target database.
 
 ## Refactor status
 
-Implementation is in progress. The MySQL corpus and schema are inherited from
-the SPARC-SQL space expander; no previously trained rules count as v3 training.
+The ANTLR4 refactor and fresh 189-feature MySQL training are complete.
+The verified v5 snapshot contains 1,263 rules; full per-rule validation,
+10,000-query evaluation, gated export and independent deployment smoke passed.
+The corpus and schema originate from the SPARC-SQL space expander; previously
+trained SQLCraft rules were not reused as v3 training results.
 
 ANTLR4 parses generated SQL. A separate generator owns type, scope, aggregation,
 and derivation metadata. Training measures only SQL whose derivation contains
@@ -30,7 +33,7 @@ and a MySQL connection. The dedicated database is `lacastv3_mysql`. Initialize
 only that database with the smoke preflight, then start corpus-wide training:
 
 ```sh
-uv run python scripts/preflight_mysql.py --initialize --output runs/preflight
+uv run python -c "from dotenv import load_dotenv; load_dotenv(); import runpy; runpy.run_path('scripts/preflight_mysql.py', run_name='__main__')" --initialize --output runs/preflight
 uv run python -m lacastv3 train --dbms mysql --work-dir runs/mysql
 uv run python -m lacastv3 audit --work-dir runs/mysql --output runs/mysql-audit
 uv run python -m lacastv3 fuzz --dbms mysql --work-dir runs/mysql --output runs/mysql-fuzz10000 --count 10000
@@ -74,7 +77,11 @@ continuous indices and snapshot hashes were independently checked. See
 `docs/results/mysql-reconciled-v5-fuzz.json`. Full expanded per-rule validation
 also completed: all 1,263 unique rules passed their individual acceptance gates
 and retained-evidence audits. See `docs/results/mysql-reconciled-v5-validation.json`.
-A final deployment bundle still requires all export gates below.
+The gated export completed at `runs/mysql-delivery-v5`. An independent copy
+with its own virtual environment passed 165 infrastructure queries and 300
+full-grammar sampled SQL queries. See `docs/results/mysql-v5-delivery.json`.
+Portable learned assets are checked in under `artifacts/mysql-v5`; use them
+as `--work-dir artifacts/mysql-v5` with this repository runtime.
 
 The fuzz command executes every generated query, retains all database failures,
 and reports ANTLR parsing errors separately. Its output directory must be new.

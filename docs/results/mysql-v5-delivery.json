@@ -1,0 +1,46 @@
+{
+  "status": "completed",
+  "export_directory": "D:\\projects\\LACASTv3\\runs\\mysql-delivery-v5",
+  "export_manifest_sha256": "e6e94c639c15cf92dfce59bf01dc075ef91d71f8ae3de22025b51e2ec9393a91",
+  "verified_export_files": 49,
+  "rules": 1263,
+  "features": 189,
+  "rules_sha256": "44292632fa4f01a0f3aa4ad97dd697452aa92a93bf11d66f0554d6888333f253",
+  "grammar_sha256": "96cdf481b13eb54d45bbe60fb7ef4a1dad79c9833eb0a34f1f578dc0d7e9a2a5",
+  "server_version": "8.4.11",
+  "independent_directory": "D:\\projects\\LACASTv3-deployment-v5-smoke",
+  "independent_environment": true,
+  "bootstrap_checksum_verified": true,
+  "infrastructure_smoke": {
+    "status": "passed",
+    "server_version": "8.4.11",
+    "database": "lacastv3_mysql",
+    "sql_mode": "ONLY_FULL_GROUP_BY,STRICT_TRANS_TABLES,NO_ENGINE_SUBSTITUTION",
+    "queries": 165,
+    "passed": 165,
+    "scope": "Hand-written infrastructure smoke rules only; not corpus training."
+  },
+  "learned_grammar_smoke": {
+    "status": "completed",
+    "requested": 300,
+    "executed": 300,
+    "passed": 300,
+    "errors": 0,
+    "accuracy": 1.0,
+    "antlr_errors": 0,
+    "elapsed_seconds": 41.68127689999528,
+    "definition": "Database execution success; all generated SQL retained, no target filtering."
+  },
+  "smoke_seed": 104729,
+  "all_smoke_records_verified": true,
+  "credential_files_in_export": false,
+  "scope": "Execution success and strict syntax; not a returned-value correctness oracle. Independent 300-query smoke supplements full 1263-rule validation and 10000-query evaluation.",
+  "final_tests": {
+    "passed": 77,
+    "elapsed_seconds": 35.47
+  },
+  "evaluated_runtime_unchanged": true,
+  "full_validation_rule_ids_matched": true,
+  "training_audit_features": 189,
+  "fuzz_records_independently_verified": 10000
+}
